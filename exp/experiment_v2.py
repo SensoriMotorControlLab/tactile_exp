@@ -198,7 +198,7 @@ def createEnvironment(cfg):
                                 fullscr=True, 
                                 units='cm', 
                                 waitBlanking=False, 
-                                viewScale=[1,-1], 
+                                #viewScale=[1,-1], 
                                 color=[-1,-1,-1], 
                                 screen=1, 
                                 monitor=myMonitor)
@@ -238,7 +238,7 @@ def createEnvironment(cfg):
 
     cfg['cursor'] = visual.Circle(  win=cfg['win'], 
                                     radius=cfg['radius'], 
-                                    lineWidth=0, 
+                                    lineWidth=1, 
                                     lineColorSpace='rgb', 
                                     lineColor=None, 
                                     fillColorSpace='rgb', 
@@ -273,9 +273,9 @@ def createEnvironment(cfg):
                                     fillColor=None          )
 
 
-    cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=True)
+    cfg['instruction'] = visual.TextStim(win=cfg['win'], text='', pos=[0,0], colorSpace='rgb', color='#999999', flipVert=False)
 
-    cfg['aimtext'] = visual.TextStim(win=cfg['win'], text="HAND movement aim\n(not cursor)", pos=[0,9.5], colorSpace='rgb', color='#999999', flipVert=True)
+    cfg['aimtext'] = visual.TextStim(win=cfg['win'], text="HAND movement aim\n(not cursor)", pos=[0,9.5], colorSpace='rgb', color='#999999', flipVert=False)
 
     #arrowvertices = ((-.33,-.33),(6.33,-.33),(6,-1),(8,0),(6,1),(6.33,.33),(-.33,.33))
     arrowvertices = ((-.02,-.02),(0.82,-.02),(0.8,-.08),(1,0),(0.8,.08),(0.82,.02),(-.02,.02))
@@ -434,26 +434,36 @@ def createTasks(cfg):
     #     strategies = strategies[::-1]
     #     stratinstr = stratinstr[::-1]
 
-    tasktrials = [       24,        16,       16,        8,       8,          8,        8,         8,        8]
+    # tasktrials = [       24,        16,       16,        8,       8,          8,        8,         8,        8]
+    # # tasktrials = [8,0,0]
+    # taskrotation = [      0,         0,        0,   np.NaN,       0,          0,        0,         0,        0]
+    # taskaiming = [     True,     False,     True,    False,     True,     False,     True,     False,     True]
+    # # taskcursor = [True,False,True,True,True]
+
+    # taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular','nocursor','regular']
+    # taskstrategy = [   'NA',      'NA',     'NA',     'NA',     'NA',      'NA',     'NA',      'NA',     'NA']
+
+    # taskinstructions = ['HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+    #                     'do NOT use your strategy\nmove HAND to target',
+    #                     'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+    #                     'the cursor is NOT your hand\n\nmove slow\nto observe the difference',
+    #                     'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+    #                     'do NOT use your strategy\nmove HAND to target',
+    #                     'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
+    #                     'do NOT use your strategy\nmove HAND to target',
+    #                     'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
+
+
+    tasktrials = [       8]
     # tasktrials = [8,0,0]
-    taskrotation = [      0,         0,        0,   np.NaN,       0,          0,        0,         0,        0]
-    taskaiming = [     True,     False,     True,    False,     True,     False,     True,     False,     True]
+    taskrotation = [      0]
+    taskaiming = [     False]
     # taskcursor = [True,False,True,True,True]
 
-    taskcursor = ['regular','nocursor','regular','clamped','regular','nocursor','regular','nocursor','regular']
-    taskstrategy = [   'NA',      'NA',     'NA',     'NA',     'NA',      'NA',     'NA',      'NA',     'NA']
+    taskcursor = ['regular']
+    taskstrategy = [   'NA']
 
-    taskinstructions = ['HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
-                        'do NOT use your strategy\nmove HAND to target',
-                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
-                        'the cursor is NOT your hand\n\nmove slow\nto observe the difference',
-                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
-                        'do NOT use your strategy\nmove HAND to target',
-                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target',
-                        'do NOT use your strategy\nmove HAND to target',
-                        'HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
-
-
+    taskinstructions = ['HAND aim strategy\n\nUSE your strategy\nmove CURSOR to target']
 
     # # TASK THAT INSTRUCTS THE EXPERIMENTER?
     # tasktrials = tasktrials + [0]
@@ -467,18 +477,18 @@ def createTasks(cfg):
 
     # NOW FOR THE ROTATED PARTs:
 
-    tasktrials = tasktrials + [8, 120,24]
-    # tasktrials = tasktrials + [8,0,0]
-    taskrotation = taskrotation + [0, -1 * cfg['rotation'], 0, -1 * cfg['rotation']]
-    taskaiming = taskaiming + [True, True, False]
-    # taskinstructions = taskinstructions + ['aim and reach for target',
-    #                                         stratinstr]
-    taskinstructions = taskinstructions + [
-        'Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
-        '',
-        'do NOT use your strategy\nmove HAND to target']
-    taskcursor = taskcursor + ['regular','regular','nocursor']
-    taskstrategy = taskstrategy + ['NA','NA','NA']
+    # tasktrials = tasktrials + [8, 120,24]
+    # # tasktrials = tasktrials + [8,0,0]
+    # taskrotation = taskrotation + [0, -1 * cfg['rotation'], 0, -1 * cfg['rotation']]
+    # taskaiming = taskaiming + [True, True, False]
+    # # taskinstructions = taskinstructions + ['aim and reach for target',
+    # #                                         stratinstr]
+    # taskinstructions = taskinstructions + [
+    #     'Reminder:\n\nThe arrow should indicate in which direction you will aim your\n\nHAND movement,\n\nsuch that the CURSOR will go straight to the\ntarget.',
+    #     '',
+    #     'do NOT use your strategy\nmove HAND to target']
+    # taskcursor = taskcursor + ['regular','regular','nocursor']
+    # taskstrategy = taskstrategy + ['NA','NA','NA']
 
 
     for taskno in range(len(tasktrials)):
@@ -584,16 +594,16 @@ def doTrial(cfg):
     holdTime = 1/3
 
     # phase 0: do pre-reach aiming if required:
-    doAim = cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]
-    if doAim:
+    # doAim = cfg['tasks'][cfg['taskno']]['aiming'][cfg['trialno']]
+    # if doAim:
 
-        cfg = doAiming(cfg)
-        aim = cfg['aim']
+    #     cfg = doAiming(cfg)
+    #     aim = cfg['aim']
 
-    else:
+    # else:
 
         # if not required: set to correct value for data file:
-        aim = np.NaN
+    aim = np.NaN
 
         # how long does one aiming trial take?
         # holdTime = holdTime + 1.5
@@ -857,8 +867,8 @@ def doAiming(cfg):
 
     while(not(aimDecided)):
 
-        keys = event.getKeys(keyList=['num_enter'])
-        if ('num_enter' in keys) and needleMoved:
+        keys = event.getKeys(keyList=['enter'])
+        if ('enter' in keys) and needleMoved:
             cfg['aim'] = -1 * cfg['aim_arrow'].ori
             aimDecided = True
             stopaiming = time.time()
