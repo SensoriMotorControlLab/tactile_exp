@@ -6,6 +6,7 @@ import wx.adv # advanced GUI widgets
 
 # we need our experiment:
 import experiment_v2
+import tact_exp
 import familiarization
 
 # we need to open webbrowsers to fill in the consent form:
