@@ -1,11 +1,11 @@
 
 
 # imports we will probably need...
-from psychopy import visual, event
+from psychopy import visual, event, monitors
 
 import numpy as np
 
-import random, os, sys
+import random, os, sys, time
 
 
 def runExperiment(ID=NULL):
@@ -20,7 +20,7 @@ def runExperiment(ID=NULL):
     # there will be 2 parts of this cfg dictionary:
     # 1. a part that is a more or less "plain text" dictionary,
     #    with objects that can be stored in a JSON
-    #    this wwill be called "state"
+    #    this will be called "state"
     # 2. a part that has binary objects that can not be stored in a JSON
     #    most notably the psychopy window, and stimulus objects
     #    this will be called "bin"
@@ -64,9 +64,6 @@ def runExperiment(ID=NULL):
         cfg = closeEnvironment(cfg)
 
 
-    # we don't need a "finally" block... I think
-
-
 
 def prepare(cfg, ID):
 
@@ -81,6 +78,25 @@ def prepare(cfg, ID):
 
 
 def setupParticipant(cfg, ID):
+
+    if ID == NULL:
+        print("participant ID not defined")
+        raise Exception("participant ID not defined")
+
+    dataFolder = "data/%s/"%(ID)
+
+
+    if os.path.isdir("data"):
+        if os.path.isdir(dataFolder):
+            # participant folder exists
+            cfg["state"]["crashRecovery"] = False
+            if os.path.isfile("%sstate.json"%(dataFolder)):
+                cfg["state"]["crashRecovery"] = True
+        else:
+            os.makedirs(dataFolder, exist_ok = True)
+    cfg["state"]["dataFolder"] = dataFolder
+
+    random.seed(ID)  
 
     # check if participant directory already exists
 
@@ -126,8 +142,38 @@ def setupEnvironment(cfg):
 def setupPsychopyWindow(cfg):
 
     # this should be a psychopy window object that has the units as centimeters
+    myMonitor = monitors.Monitor(name='temp',
+                                 distance=100,
+                                 width=52.7)
+    myMonitor.setSizePix([1920,1080])
 
-    cfg['bin']['win'] = NULL
+    cfg["bin"]['win'] = visual.Window( size=[1920,1080], 
+                                fullscr=True, 
+                                units='cm', 
+                                waitBlanking=False, 
+                                #viewScale=[1,-1], 
+                                color=[-1,-1,-1], 
+                                screen=0, 
+                                monitor=myMonitor)
+
+    #   "size_px"         : [1920, 1080], 
+    #   "size_cm"         : [52.7, 29.6],
+    #   "viewscale"       : [1,-1],
+
+    # for testing on non-mirrored setup:
+    #cfg['win'] = visual.Window(fullscr=True, units='pix', waitBlanking=True, viewScale=[1,1], color=[-1,-1,-1])
+
+    # set up the workspace as a function of the size of the window:
+    # winSize = cfg['win'].size
+
+    # we want 8 cm reaches
+    # if we apply the viewscale correctly, that should be possible
+    # leaving 3.375/2 cm free on top and bottom
+    # the monitor on the tablet setup is 1920 pixels wide,
+    # and that should span 31 cm on the tablet surface
+
+    # cfg['xPPC'] = 1920/52.7
+    # cfg['yPPC'] = 1080/29.6
 
     return(cfg)
 
@@ -144,12 +190,35 @@ def setupTabletTracker(cfg):
 
     def trackerPos():
         
-        # code
-        # more code
+            # set up 'mouse' object to track reaches:
+    class myMouse:
 
-        return([X,Y,T])
+        # TABLET:
+        # "size_px"    : [1920, 1080],
+        # "size_cm"    : [31.1, 21.6],
+        # "mapping"    : 'relative',     <-   this is not true right now
 
-    cfg['bin']['pos'] = trackerPos
+        # MONITOR:
+        #   "size_px"         : [1920, 1080], 
+        #   "size_cm"         : [52.7, 29.6],
+        #   "viewscale"       : [1,-1],
+
+        def __init__(self,cfg):
+            # we use a psychopy mouse object
+            self.psyMouse = event.Mouse(visible = False, newPos = None, win = cfg['bin']['win'])
+            self.xfactor = 52.7/31.1
+            self.yfactor = 29.6/21.6
+
+        def getPos(self):
+            # but in addition to the position, we also return the time the position was asked for
+            [X,Y] = self.psyMouse.getPos()
+            st = time.time()
+            X = X / self.xfactor # scale to centimeters ?
+            Y = Y / self.yfactor # scale to centimeters ?
+
+            return [X,Y,st]
+
+    cfg['bin']["tracker"] = myMouse(cfg)
 
     return(cfg)
 
@@ -159,9 +228,32 @@ def setupStimuli(cfg):
     # this creates the stimulu we'll use, for now there are at least 4:
 
     # 1. a cursor (circle)
+    cfg['bin']['cursor'] = visual.Circle(  win=cfg['bin']['win'], 
+                                    radius=0.25, 
+                                    lineWidth=0, 
+                                    lineColorSpace='rgb', 
+                                    lineColor=None, 
+                                    fillColorSpace='rgb', 
+                                    fillColor='#990000'     )
     # 2. a start postition (circle)
+    cfg['bin']['start'] = visual.Circle(  win=cfg['bin']['win'], 
+                                    radius=1 
+                                    lineWidth=2, 
+                                    lineColorSpace='rgb', 
+                                    lineColor='#999999', 
+                                    fillColorSpace='rgb', 
+                                    fillColor=None          )
     # 3. a target position (circle)
+    cfg['bin']['target'] = visual.Circle(  win=cfg['bin']['win'], 
+                                    radius=1 
+                                    lineWidth=2, 
+                                    lineColorSpace='rgb', 
+                                    lineColor='#999999', 
+                                    fillColorSpace='rgb', 
+                                    fillColor=None          )
     # 4. an empty text box for on-screen instructions
+    cfg['bin']['instruction'] = visual.TextStim(win=cfg['bin']['win'], text='hello world', pos=[0,0], colorSpace='rgb', color='#999999')
+
 
     # these are all psychopy stim objects, associated with the window we created
 
@@ -175,7 +267,7 @@ def runTrial(cfg):
     # defintion of conditions
     # columns = start position, end position, target size, tactile stim
     # run while loop
-    # store data with trial number
+    # store data with trial number in folder
     # independent variables plus participant dependent variables (movement time)
 
 
