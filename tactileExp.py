@@ -38,7 +38,7 @@ def runExperiment(ID=NULL):
 
         cfg = prepare(cfg, ID)
 
-        cfg = runAll(cfg)
+        cfg = runTasks(cfg)
 
     except:
 
@@ -47,14 +47,6 @@ def runExperiment(ID=NULL):
         cfg = saveState(cfg)
 
         # close the psychopy environment (if still possible)
-
-        try:
-
-            cfg = closeEnvironment(cfg)
-
-        except:
-
-            # print the exception?
 
     else:
 
@@ -66,8 +58,11 @@ def runExperiment(ID=NULL):
         # and maybe generate a summary with one line per trial?
         cfg = createSummary(cfg)
 
+    finally:
+
         # still also need to close the environment:
         cfg = closeEnvironment(cfg)
+
 
     # we don't need a "finally" block... I think
 
@@ -169,6 +164,21 @@ def setupStimuli(cfg):
     # 4. an empty text box for on-screen instructions
 
     # these are all psychopy stim objects, associated with the window we created
+
+
+    return(cfg)
+
+def runTrial(cfg):
+    # read in trial info from cfg
+    # current trial number (variable)
+    # look up condition (in condition order list)
+    # defintion of conditions
+    # columns = start position, end position, target size, tactile stim
+    # run while loop
+    # store data with trial number
+    # independent variables plus participant dependent variables (movement time)
+
+
 
 
     return(cfg)
