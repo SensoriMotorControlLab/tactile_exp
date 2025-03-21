@@ -311,7 +311,7 @@ def setupTasks(cfg):
     print(Nconditions)
     CondIdxOne = list(range(int(Nconditions/2)))
     print(CondIdxOne)
-    CondIdxTwo = list(range(int(Nconditions/2, Nconditions)))
+    CondIdxTwo = list(range(int(Nconditions/2), Nconditions))
     print(CondIdxTwo)
     if random.sample([True, False],1):
         print("switch conditions")
