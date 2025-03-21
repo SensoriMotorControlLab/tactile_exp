@@ -77,7 +77,7 @@ def prepare(cfg, ID):
 
     cfg = setupTasks(cfg)
 
-    print("task setup succeeded")
+    print("preparation finished")
 
     cfg = saveState(cfg)
 
@@ -294,8 +294,6 @@ def foldout(values, names):
 
 def setupTasks(cfg):
 
-    print("setting up tasks")
-
     # master list of all conditions, positon, size, tactile stim
     conditions = foldout(values = [[1, 0.5], 
                                     [False, 1/3, 2/3], 
@@ -303,34 +301,21 @@ def setupTasks(cfg):
                          names = ["targetSize", "tactileStim", "targetPos"])
     cfg["state"]["conditions"] = conditions
 
-    print(conditions)
-
     # create a randomized list of trials unique to each participant ID
 
     Nconditions = len(conditions[list(conditions.keys())[0]])
-    print(Nconditions)
     CondIdxOne = list(range(int(Nconditions/2)))
-    print(CondIdxOne)
     CondIdxTwo = list(range(int(Nconditions/2), Nconditions))
-    print(CondIdxTwo)
     if random.sample([True, False],1):
-        print("switch conditions")
         CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
-        print(CondIdxOne)
-        print(CondIdxTwo)
 
     # two pseudo-randomized blocks
 
     trialOrder = []
-    print(trialOrder)
     for blockNo in range(2):
-        print(blockNo)
         random.shuffle(CondIdxOne)
-        print(CondIdxOne)
         random.shuffle(CondIdxTwo)
-        print(CondIdxTwo)
         for Idx in range(len(CondIdxOne)):
-            print([blockNo, Idx])
             trialOrder.append(CondIdxOne[Idx])
             trialOrder.append(CondIdxTwo[Idx])
 
@@ -343,8 +328,6 @@ def setupTasks(cfg):
 def saveState(cfg):
 
     # generate a file name, open a stream, and save state as JSON into the stream
-
-    print(cfg)
     
     filename = '%sstate.json'%(cfg["state"]["dataFolder"])
 
