@@ -187,6 +187,8 @@ def setupPsychopyWindow(cfg):
 
 def setupTabletTracker(cfg):
 
+    print("setting up tablet")
+
     # create a custom getpos function
     # using the mouse.getPos thing internally
     # but transform to centimeters on the tablet
@@ -231,6 +233,8 @@ def setupTabletTracker(cfg):
 
 
 def setupStimuli(cfg):
+
+    print("setting up stimuli")
 
     # this creates the stimulu we'll use, for now there are at least 4:
 
@@ -298,6 +302,8 @@ def foldout(values, names):
     return(df.to_dict())
 
 def setupTasks(cfg):
+
+    print("setting up tasks")
 
     # master list of all conditions, positon, size, tactile stim
     conditions = foldout(values = [[1, 0.5], 
