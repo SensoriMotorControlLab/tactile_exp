@@ -7,6 +7,8 @@ import numpy as np
 
 import random, os, sys, time
 
+import pandas as pd
+
 
 def runExperiment(ID=NULL):
 
@@ -274,3 +276,20 @@ def runTrial(cfg):
 
 
     return(cfg)
+
+def foldout(a, names):
+    # http://code.activestate.com/recipes/496807-list-of-all-combination-from-multiple-lists/
+
+
+
+    r=[[]]
+    for x in a:
+        r = [ i + [y] for y in x for i in r ]
+
+    # return(pd.DataFrame(r))
+
+    df = pd.DataFrame(r)
+    df.columns = names
+    return(df.to_dict())
+    
+
