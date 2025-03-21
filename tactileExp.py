@@ -10,7 +10,7 @@ import random, os, sys, time, json
 import pandas as pd
 
 
-def runExperiment(ID=NULL):
+def runExperiment(ID=None):
 
     # every function, except this one, will get a cfg dictionary as input
     # it will change it, and then also return it as output
@@ -83,7 +83,7 @@ def prepare(cfg, ID):
 
 def setupParticipant(cfg, ID):
 
-    if ID == NULL:
+    if ID == None:
         print("participant ID not defined")
         raise Exception("participant ID not defined")
 
