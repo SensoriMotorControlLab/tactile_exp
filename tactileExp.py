@@ -81,8 +81,6 @@ def prepare(cfg, ID):
 
     return(cfg)
 
-
-
 def setupParticipant(cfg, ID):
 
     if ID == None:
@@ -342,5 +340,11 @@ def saveState(cfg):
     with open( file=filename,
                mode='w') as fp:
         json.dump(cfg["state"], fp, indent=2)
+
+    return(cfg)
+
+def closeEnvironment(cfg):
+
+    cfg['bin']['win'].close()
 
     return(cfg)
