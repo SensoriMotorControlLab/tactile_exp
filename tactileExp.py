@@ -301,6 +301,8 @@ def setupTasks(cfg):
                          names = ["targetSize", "tactileStim", "targetPos"])
     cfg["state"]["conditions"] = conditions
 
+    print(conditions)
+
     # create a randomized list of trials unique to each participant ID
 
     Nconditions = len(conditions[list(conditions.keys())[0]])
@@ -308,6 +310,8 @@ def setupTasks(cfg):
     CondIdxTwo = list(range(int(Nconditions/2, Nconditions)))
     if random.sample([True, False],1):
         CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
+
+    print(Nconditions)
 
     # two pseudo-randomized blocks
 
@@ -317,12 +321,12 @@ def setupTasks(cfg):
         random.shuffle(CondIdxOne)
         random.shuffle(CondIdxTwo)
         for Idx in range(len(CondIdxOne)):
-            
+            print([blockNo, Idx])
             trialOrder.append(CondIdxOne[Idx])
             trialOrder.append(CondIdxTwo[Idx])
 
     print(trialOrder)
-    
+
     cfg["state"]["trialOrder"] = trialOrder
 
     return(cfg)
