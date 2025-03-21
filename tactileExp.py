@@ -183,7 +183,34 @@ def setupPsychopyWindow(cfg):
     # cfg['yPPC'] = 1080/29.6
 
     return(cfg)
+    
+ # set up 'mouse' object to track reaches:
+class myMouse:
 
+    # TABLET:
+    # "size_px"    : [1920, 1080],
+    # "size_cm"    : [31.1, 21.6],
+    # "mapping"    : 'relative',     <-   this is not true right now
+
+    # MONITOR:
+    #   "size_px"         : [1920, 1080], 
+    #   "size_cm"         : [52.7, 29.6],
+    #   "viewscale"       : [1,-1],
+
+    def __init__(self,cfg):
+        # we use a psychopy mouse object
+        self.psyMouse = event.Mouse(visible = False, newPos = None, win = cfg['bin']['win'])
+        self.xfactor = 52.7/31.1
+        self.yfactor = 29.6/21.6
+
+    def getPos(self):
+        # but in addition to the position, we also return the time the position was asked for
+        [X,Y] = self.psyMouse.getPos()
+        st = time.time()
+        X = X / self.xfactor # scale to centimeters ?
+        Y = Y / self.yfactor # scale to centimeters ?
+
+        return [X,Y,st]
 
 def setupTabletTracker(cfg):
 
@@ -196,36 +223,6 @@ def setupTabletTracker(cfg):
     # for the most accurate estimates of speed, acceleration etc possible
     # make them system timestamps in UNIX time (seconds since jan 1st 1980)
     # so that we also know exactly when the participant did the task
-
-    def trackerPos():
-        
-            # set up 'mouse' object to track reaches:
-        class myMouse:
-
-            # TABLET:
-            # "size_px"    : [1920, 1080],
-            # "size_cm"    : [31.1, 21.6],
-            # "mapping"    : 'relative',     <-   this is not true right now
-
-            # MONITOR:
-            #   "size_px"         : [1920, 1080], 
-            #   "size_cm"         : [52.7, 29.6],
-            #   "viewscale"       : [1,-1],
-
-            def __init__(self,cfg):
-                # we use a psychopy mouse object
-                self.psyMouse = event.Mouse(visible = False, newPos = None, win = cfg['bin']['win'])
-                self.xfactor = 52.7/31.1
-                self.yfactor = 29.6/21.6
-
-            def getPos(self):
-                # but in addition to the position, we also return the time the position was asked for
-                [X,Y] = self.psyMouse.getPos()
-                st = time.time()
-                X = X / self.xfactor # scale to centimeters ?
-                Y = Y / self.yfactor # scale to centimeters ?
-
-                return [X,Y,st]
 
     cfg['bin']["tracker"] = myMouse(cfg)
 
