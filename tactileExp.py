@@ -77,7 +77,7 @@ def prepare(cfg, ID):
 
     cfg = setupTasks(cfg)
 
-    print(cfg)
+    print("task setup succeeded")
 
     cfg = saveState(cfg)
 
@@ -308,20 +308,27 @@ def setupTasks(cfg):
     # create a randomized list of trials unique to each participant ID
 
     Nconditions = len(conditions[list(conditions.keys())[0]])
-    CondIdxOne = list(range(int(Nconditions/2)))
-    CondIdxTwo = list(range(int(Nconditions/2, Nconditions)))
-    if random.sample([True, False],1):
-        CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
-
     print(Nconditions)
+    CondIdxOne = list(range(int(Nconditions/2)))
+    print(CondIdxOne)
+    CondIdxTwo = list(range(int(Nconditions/2, Nconditions)))
+    print(CondIdxTwo)
+    if random.sample([True, False],1):
+        print("switch conditions")
+        CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
+        print(CondIdxOne)
+        print(CondIdxTwo)
 
     # two pseudo-randomized blocks
 
     trialOrder = []
-
+    print(trialOrder)
     for blockNo in range(2):
+        print(blockNo)
         random.shuffle(CondIdxOne)
+        print(CondIdxOne)
         random.shuffle(CondIdxTwo)
+        print(CondIdxTwo)
         for Idx in range(len(CondIdxOne)):
             print([blockNo, Idx])
             trialOrder.append(CondIdxOne[Idx])
