@@ -277,13 +277,13 @@ def runTrial(cfg):
 
     return(cfg)
 
-def foldout(a, names):
+def foldout(values, names):
     # http://code.activestate.com/recipes/496807-list-of-all-combination-from-multiple-lists/
 
 
 
     r=[[]]
-    for x in a:
+    for x in values:
         r = [ i + [y] for y in x for i in r ]
 
     # return(pd.DataFrame(r))
@@ -291,5 +291,35 @@ def foldout(a, names):
     df = pd.DataFrame(r)
     df.columns = names
     return(df.to_dict())
-    
 
+def setupTasks(cfg):
+
+    # master list of all conditions, positon, size, tactile stim
+    conditions = foldout(values = [[1, 0.5], 
+                                    [False, 1/3, 2/3], 
+                                    [(-10, 5), (-10, -5), (10, 5), (10, -5)]]
+                         names = ["targetSize", "tactileStim", "targetPos"])
+    cfg["state"]["conditions"] = conditions
+
+    # create a randomized list of trials unique to each participant ID
+
+    Nconditions = len(conditions[list(conditions.keys())[0]])
+    CondIdxOne = list(range(int(Nconditions/2)))
+    CondIdxTwo = list(range(int(Nconditions/2, Nconditions)))
+    if random.sample([True, False],1):
+        CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
+
+    # two pseudo-randomized blocks
+
+    trialOrder = []
+
+    for blockNo in range(2):
+        random.shuffle(CondIdxOne)
+        random.shuffle(CondIdxTwo)
+        for Idx in range(len(CondIdxOne)):
+            
+            trialOrder.append(CondIdxOne[Idx])
+            trialOrder.append(CondIdxTwo[Idx])
+    cfg["state"]["trialOrder"] = trialOrder
+
+    return(cfg)
