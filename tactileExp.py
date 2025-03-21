@@ -46,6 +46,8 @@ def runExperiment(ID=None):
 
         # something went wrong, save the state part of the cfg:
 
+        print("something wrong")
+
         cfg = saveState(cfg)
 
         # close the psychopy environment (if still possible)
