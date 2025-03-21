@@ -319,8 +319,6 @@ def setupTasks(cfg):
             trialOrder.append(CondIdxOne[Idx])
             trialOrder.append(CondIdxTwo[Idx])
 
-    print(trialOrder)
-
     cfg["state"]["trialOrder"] = trialOrder
 
     return(cfg)
