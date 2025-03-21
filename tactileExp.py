@@ -299,7 +299,7 @@ def setupTasks(cfg):
     # master list of all conditions, positon, size, tactile stim
     conditions = foldout(values = [[1, 0.5], 
                                     [False, 1/3, 2/3], 
-                                    [(-10, 5), (-10, -5), (10, 5), (10, -5)]]
+                                    [(-10, 5), (-10, -5), (10, 5), (10, -5)]],
                          names = ["targetSize", "tactileStim", "targetPos"])
     cfg["state"]["conditions"] = conditions
 
