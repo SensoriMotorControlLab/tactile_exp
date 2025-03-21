@@ -241,7 +241,7 @@ def setupStimuli(cfg):
                                     fillColor='#990000'     )
     # 2. a start postition (circle)
     cfg['bin']['start'] = visual.Circle(  win=cfg['bin']['win'], 
-                                    radius=1 
+                                    radius=1, 
                                     lineWidth=2, 
                                     lineColorSpace='rgb', 
                                     lineColor='#999999', 
@@ -249,7 +249,7 @@ def setupStimuli(cfg):
                                     fillColor=None          )
     # 3. a target position (circle)
     cfg['bin']['target'] = visual.Circle(  win=cfg['bin']['win'], 
-                                    radius=1 
+                                    radius=1, 
                                     lineWidth=2, 
                                     lineColorSpace='rgb', 
                                     lineColor='#999999', 
