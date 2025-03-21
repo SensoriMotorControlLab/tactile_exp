@@ -330,7 +330,7 @@ def saveState(cfg):
 
     # generate a file name, open a stream, and save state as JSON into the stream
 
-    filename = '%s/state.json'%(cfg["state"]["dataFolder"])
+    filename = '%sstate.json'%(cfg["state"]["dataFolder"])
 
     with open( file=filename,
                mode='w') as fp:
