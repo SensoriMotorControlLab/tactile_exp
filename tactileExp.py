@@ -89,15 +89,14 @@ def setupParticipant(cfg, ID):
 
     dataFolder = "data/%s/"%(ID)
 
-
-    if os.path.isdir("data"):
-        if os.path.isdir(dataFolder):
-            # participant folder exists
-            cfg["state"]["crashRecovery"] = False
-            if os.path.isfile("%sstate.json"%(dataFolder)):
-                cfg["state"]["crashRecovery"] = True
-        else:
-            os.makedirs(dataFolder, exist_ok = True)
+    os.makedirs("data", exist_ok = True)
+    if os.path.isdir(dataFolder):
+        # participant folder exists
+        cfg["state"]["crashRecovery"] = False
+        if os.path.isfile("%sstate.json"%(dataFolder)):
+            cfg["state"]["crashRecovery"] = True
+    else:
+        os.makedirs(dataFolder, exist_ok = True)
     cfg["state"]["dataFolder"] = dataFolder
 
     random.seed(ID)  
