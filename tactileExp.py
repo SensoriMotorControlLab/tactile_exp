@@ -5,7 +5,7 @@ from psychopy import visual, event, monitors
 
 import numpy as np
 
-import random, os, sys, time
+import random, os, sys, time, json
 
 import pandas as pd
 
@@ -74,6 +74,8 @@ def prepare(cfg, ID):
     cfg = setupEnvironment(cfg)
 
     cfg = setupTasks(cfg)
+
+    cfg = saveState(cfg)
 
     return(cfg)
 
@@ -321,5 +323,17 @@ def setupTasks(cfg):
             trialOrder.append(CondIdxOne[Idx])
             trialOrder.append(CondIdxTwo[Idx])
     cfg["state"]["trialOrder"] = trialOrder
+
+    return(cfg)
+
+def saveState(cfg):
+
+    # generate a file name, open a stream, and save state as JSON into the stream
+
+    filename = '%s/state.json'%(cfg["state"]["dataFolder"])
+
+    with open( file=filename,
+               mode='w') as fp:
+        json.dump(cfg["state"], fp, indent=2)
 
     return(cfg)
