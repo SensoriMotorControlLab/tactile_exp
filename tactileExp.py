@@ -329,6 +329,8 @@ def saveState(cfg):
 
     # generate a file name, open a stream, and save state as JSON into the stream
 
+    print(cfg)
+    
     filename = '%sstate.json'%(cfg["state"]["dataFolder"])
 
     with open( file=filename,
