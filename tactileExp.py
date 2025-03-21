@@ -75,6 +75,8 @@ def prepare(cfg, ID):
 
     cfg = setupTasks(cfg)
 
+    print(cfg)
+
     cfg = saveState(cfg)
 
     return(cfg)
@@ -137,7 +139,11 @@ def setupEnvironment(cfg):
 
     cfg = setupTabletTracker(cfg)
 
+    print(cfg)
+
     cfg = setupStimuli(cfg)
+
+    print(cfg)
 
 
     return(cfg)
