@@ -373,14 +373,15 @@ def runTrial(cfg):
         #     # randomly pick a left Target
 
         #     startPos = random.sample(cfg['state']['leftTargets'], 1)
-
+    print("assigning positions")
     cfg['bin']['target'].pos = targetPos
     cfg['bin']['start'].pos = startPos
+    print("make rotation matrix")
     theta = -1 * np.arctan2(targetPos[1] - startPos[1],targetPos[0] - startPos[0])
     R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
 
     runningTrial = True
-
+    print("start while loop")
     while runningTrial:
 
         [x,y,t] = cfg['bin']["tracker"].getPos()
