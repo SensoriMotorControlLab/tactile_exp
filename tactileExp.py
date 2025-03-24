@@ -312,6 +312,7 @@ def setupTasks(cfg):
                                     [False, 1/3, 2/3], 
                                     rightTargets],
                          names = ["targetSize", "tactileStim", "targetPos"])
+    print("concatenate conditions")
     conditions = pd.concat(leftConditions, rightConditions)
     cfg["state"]["conditions"] = conditions
 
