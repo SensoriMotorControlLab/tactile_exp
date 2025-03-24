@@ -339,14 +339,16 @@ def setupTasks(cfg):
 def runTasks(cfg):
     print("runTasks")
     print(len(cfg["state"]["trialOrder"]))
-    for trialNumber in range(len(cfg["state"]["trialOrder"])):
+    trialOrder = cfg['state']['trialOrder']
+    nTrials = len(trialOrder)
+    for trialNumber in range(nTrials):
         print(trialNumber)
         cfg['state']['trialNumber'] = trialNumber
 
         # show instructions if applicable
 
-        # cfg = runTrial(cfg)
-        # cfg = saveState(cfg)
+        cfg = runTrial(cfg)
+       #  cfg = saveState(cfg)
 
     return(cfg)
 
