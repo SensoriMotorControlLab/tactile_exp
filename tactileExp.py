@@ -337,8 +337,10 @@ def setupTasks(cfg):
     return(cfg)
 
 def runTasks(cfg):
+    print("runTasks")
 
     for trialNumber in range(len(cfg["state"]["trialOrder"])):
+        print(trialNumber)
         cfg['state']['trialNumber'] = trialNumber
 
         # show instructions if applicable
@@ -350,7 +352,7 @@ def runTasks(cfg):
 
 def runTrial(cfg):
     trialNumber =  cfg['state']['trialNumber']
-    print[trialNumber]
+    print(trialNumber)
     targetSize = cfg['state']['conditions']['targetSize'][trialNumber]
     tactileStim = cfg['state']['conditions']['tactileStim'][trialNumber]
     targetPos = cfg['state']['conditions']['targetPos'][trialNumber]
