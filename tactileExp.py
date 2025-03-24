@@ -295,6 +295,7 @@ def foldout(values, names):
     return(df.to_dict())
 
 def setupTasks(cfg):
+    print("setUp Tasks")
 
     leftTargets = [(-10, 5), (-10, -5)]
     rightTargets = [(10, 5), (10, -5)]
@@ -315,6 +316,8 @@ def setupTasks(cfg):
     cfg["state"]["conditions"] = conditions
 
     # create a randomized list of trials unique to each participant ID
+
+    print("randomize conditions")
 
     Nconditions = len(conditions[list(conditions.keys())[0]])
     CondIdxOne = list(range(int(Nconditions/2)))
