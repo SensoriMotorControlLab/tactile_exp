@@ -403,11 +403,15 @@ def runTrial(cfg):
             runningTrial = False
         
         if phase == 2:
+            cfg['bin']['target'].draw()
+            cfg['bin']['cursor'].draw()
             # check if hold is complete
             if (time.time() > (holdStartTime + 0.1)):
                 phase = 3
 
         if phase == 1:
+            cfg['bin']['target'].draw()
+            cfg['bin']['cursor'].draw()
             #check if target has been reached
             distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
             if distance < cfg['bin']['target'].radius:
@@ -415,6 +419,8 @@ def runTrial(cfg):
                 phase = 2
 
         if phase == 0:
+            cfg['bin']['start'].draw()
+            cfg['bin']['cursor'].draw()
             # check if cursor is in the home position
             distance = ((cursorPos[0]-startPos[0])**2+(cursorPos[1]-startPos[1])**2)**0.5
             if distance < cfg['bin']['start'].radius:
