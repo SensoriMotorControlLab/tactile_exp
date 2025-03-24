@@ -410,14 +410,14 @@ def runTrial(cfg):
         if phase == 1:
             #check if target has been reached
             distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
-            if distance < targetPos.radius:
+            if distance < cfg['bin']['target'].radius:
                 holdStartTime = time.time()
                 phase = 2
 
         if phase == 0:
             # check if cursor is in the home position
             distance = ((cursorPos[0]-startPos[0])**2+(cursorPos[1]-startPos[1])**2)**0.5
-            if distance < startPos.radius:
+            if distance < cfg['bin']['start'].radius:
                 phase = 1
 
         # distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
