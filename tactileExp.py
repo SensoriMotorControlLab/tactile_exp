@@ -345,8 +345,8 @@ def runTasks(cfg):
 
         # show instructions if applicable
 
-        cfg = runTrial(cfg)
-        cfg = saveState(cfg)
+        # cfg = runTrial(cfg)
+        # cfg = saveState(cfg)
 
     return(cfg)
 
