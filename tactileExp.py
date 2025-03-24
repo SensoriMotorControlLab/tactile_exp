@@ -429,9 +429,9 @@ def runTrial(cfg):
         # distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
         # if distance < 0.5:
         #     runningTrial = False
-        cfg['bin']['target'].draw()
-        cfg['bin']['start'].draw()
-        cfg['bin']['cursor'].draw()
+        # cfg['bin']['target'].draw()
+        # cfg['bin']['start'].draw()
+        # cfg['bin']['cursor'].draw()
         cfg['bin']['win'].flip()
     
 
