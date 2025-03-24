@@ -355,14 +355,16 @@ def runTasks(cfg):
 def runTrial(cfg):
     trialNumber =  cfg['state']['trialNumber']
     print(trialNumber)
-    targetSize = cfg['state']['conditions']['targetSize'][trialNumber]
-    tactileStim = cfg['state']['conditions']['tactileStim'][trialNumber]
-    targetPos = cfg['state']['conditions']['targetPos'][trialNumber]
+    condIdx = cfg['state']['trialOrder'][trialNumber]
+    targetSize = cfg['state']['conditions']['targetSize'][condIdx]
+    tactileStim = cfg['state']['conditions']['tactileStim'][condIdx]
+    targetPos = cfg['state']['conditions']['targetPos'][condIdx]
     print(targetPos)
     print("getting start pos")
     if trialNumber > 0:
         print("get startPos from previous trial")
-        startPos = cfg['state']['conditions']['targetPos'][trialNumber-1]
+        prevCondIdx = cfg['state']['trialOrder'][trialNumber-1]
+        startPos = cfg['state']['conditions']['targetPos'][prevCondIdx]
     else:
         startPos = [0, 0] 
         # if tuple(targetPos) in cfg['state']['leftTargets']:
