@@ -371,13 +371,13 @@ def runTrial(cfg):
 
             # randomly pick a right Target
 
-            startPos = random.sample(cfg['state']['rightTargets'], 1)
+            startPos = random.sample(cfg['state']['rightTargets'], 1)[0]
 
         else:
 
             # randomly pick a left Target
 
-            startPos = random.sample(cfg['state']['leftTargets'], 1)
+            startPos = random.sample(cfg['state']['leftTargets'], 1)[0]
     print("assigning positions")
     cfg['bin']['target'].pos = targetPos
     cfg['bin']['target'].radius = targetSize
