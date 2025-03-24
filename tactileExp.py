@@ -44,11 +44,11 @@ def runExperiment(ID=None):
 
         cfg = runTasks(cfg)
 
-    except:
+    except Exception as e:
 
         # something went wrong, save the state part of the cfg:
 
-        print("something wrong")
+        print(e)
 
         cfg = saveState(cfg)
 
