@@ -349,6 +349,7 @@ def runTasks(cfg):
     return(cfg)
 
 def runTrial(cfg):
+    print("runningTrial")
     trialNumber =  cfg['state']['trialNumber']
     targetSize = cfg['state']['conditions']['targetSize'][trialNumber]
     tactileStim = cfg['state']['conditions']['tactileStim'][trialNumber]
