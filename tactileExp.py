@@ -358,19 +358,21 @@ def runTrial(cfg):
     targetPos = cfg['state']['conditions']['targetPos'][trialNumber]
     print("getting start pos")
     if trialNumber > 0:
+        print("get startPos from previous trial")
         startPos = cfg['state']['conditions']['targetPos'][trialNumber-1]
-    else: 
-        if tuple(targetPos) in cfg['state']['leftTargets']:
+    else:
+        startPos = [0, 0] 
+        # if tuple(targetPos) in cfg['state']['leftTargets']:
 
-            #randomly pick a right Target
+        #     #randomly pick a right Target
 
-            startPos = random.sample(cfg['state']['rightTargets'], 1)
+        #     startPos = random.sample(cfg['state']['rightTargets'], 1)
 
-        else:
+        # else:
 
-            # randomly pick a left Target
+        #     # randomly pick a left Target
 
-            startPos = random.sample(cfg['state']['leftTargets'], 1)
+        #     startPos = random.sample(cfg['state']['leftTargets'], 1)
 
     cfg['bin']['target'].pos = targetPos
     cfg['bin']['start'].pos = startPos
