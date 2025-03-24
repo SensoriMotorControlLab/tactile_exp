@@ -34,11 +34,13 @@ def runExperiment(ID=None):
     cfg['state'] = {}
     cfg['bin']   = {}
 
+    cfg['state']['ID'] = ID
+
     # everything else we do will live in a try / except / else / finally block:
 
     try:
 
-        cfg = prepare(cfg, ID)
+        cfg = prepare(cfg)
 
         cfg = runTasks(cfg)
 
@@ -69,9 +71,9 @@ def runExperiment(ID=None):
 
 
 
-def prepare(cfg, ID):
+def prepare(cfg):
 
-    cfg = setupParticipant(cfg, ID)
+    cfg = setupParticipant(cfg)
 
     cfg = setupEnvironment(cfg)
 
@@ -83,13 +85,13 @@ def prepare(cfg, ID):
 
     return(cfg)
 
-def setupParticipant(cfg, ID):
+def setupParticipant(cfg):
 
-    if ID == None:
+    if cfg['state']['ID'] == None:
         print("participant ID not defined")
         raise Exception("participant ID not defined")
 
-    dataFolder = "data/%s/"%(ID)
+    dataFolder = "data/%s/"%(cfg['state']['ID'])
 
     os.makedirs("data", exist_ok = True)
     if os.path.isdir(dataFolder):
@@ -101,7 +103,7 @@ def setupParticipant(cfg, ID):
         os.makedirs(dataFolder, exist_ok = True)
     cfg["state"]["dataFolder"] = dataFolder
 
-    random.seed(ID)  
+    random.seed(cfg['state']['ID'])  
 
     # check if participant directory already exists
 
@@ -239,7 +241,7 @@ def setupStimuli(cfg):
                                     fillColor='#990000'     )
     # 2. a start postition (circle)
     cfg['bin']['start'] = visual.Circle(  win=cfg['bin']['win'], 
-                                    radius=1, 
+                                    radius=0.5, 
                                     lineWidth=2, 
                                     lineColorSpace='rgb', 
                                     lineColor='#999999', 
@@ -294,11 +296,22 @@ def foldout(values, names):
 
 def setupTasks(cfg):
 
+    leftTargets = [(-10, 5), (-10, -5)]
+    rightTargets = [(10, 5), (10, -5)]
+
+    cfg['state']['leftTargets'] = leftTargets
+    cfg['state']['rightTargets'] = rightTargets
+
     # master list of all conditions, positon, size, tactile stim
-    conditions = foldout(values = [[1, 0.5], 
+    leftConditions = foldout(values = [[1, 0.5], 
                                     [False, 1/3, 2/3], 
-                                    [(-10, 5), (-10, -5), (10, 5), (10, -5)]],
+                                    leftTargets],
                          names = ["targetSize", "tactileStim", "targetPos"])
+    rightConditions = foldout(values = [[1, 0.5], 
+                                    [False, 1/3, 2/3], 
+                                    rightTargets],
+                         names = ["targetSize", "tactileStim", "targetPos"])
+    conditions = pd.concat(leftConditions, rightConditions)
     cfg["state"]["conditions"] = conditions
 
     # create a randomized list of trials unique to each participant ID
@@ -323,13 +336,70 @@ def setupTasks(cfg):
 
     return(cfg)
 
+def runTasks(cfg):
+
+    for trialNumber in range(len(cfg["state"]["trialOrder"])):
+        cfg['state']['trialNumber'] = trialNumber
+
+        # show instructions if applicable
+
+        cfg = runTrial(cfg)
+        cfg = saveState(cfg)
+
+    return(cfg)
+
+def runTrial(cfg):
+    trialNumber =  cfg['state']['trialNumber']
+    targetSize = cfg['state']['conditions']['targetSize'][trialNumber]
+    tactileStim = cfg['state']['conditions']['tactileStim'][trialNumber]
+    targetPos = cfg['state']['conditions']['targetPos'][trialNumber]
+
+    if trialNumber > 0:
+        startPos = cfg['state']['conditions']['targetPos'][trialNumber-1]
+    else: 
+        if tuple(targetPos) in cfg['state']['leftTargets']:
+
+            #randomly pick a right Target
+
+            startPos = random.sample(cfg['state']['rightTargets'], 1)
+
+        else:
+
+            # randomly pick a left Target
+
+            startPos = random.sample(cfg['state']['leftTargets'], 1)
+
+    cfg['bin']['target'].pos = targetPos
+    cfg['bin']['start'].pos = startPos
+    theta = -1 * np.arctan2(targetPos[1] - startPos[1],targetPos[0] - startPos[0])
+    R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
+
+    runningTrial = True
+
+    while runningTrial:
+
+        [x,y,t] = cfg['bin']["tracker"].getPos()
+        cursorPos = [x,y]
+        cfg['bin']['cursor'].pos = cursorPos
+
+        distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
+        if distance < 0.5:
+            runningTrial = False
+        cfg['bin']['target'].draw()
+        cfg['bin']['start'].draw()
+        cfg['bin']['cursor'].draw()
+        cfg['bin']['win'].flip()
+    
+
+    return(cfg)
+
 def saveState(cfg):
 
     # generate a file name, open a stream, and save state as JSON into the stream
     
     filename = '%sstate.json'%(cfg["state"]["dataFolder"])
 
-    with open( file=filename,
+    with open(file=filename,
                mode='w') as fp:
         json.dump(cfg["state"], fp, indent=2)
 
