@@ -313,7 +313,7 @@ def setupTasks(cfg):
                                     rightTargets],
                          names = ["targetSize", "tactileStim", "targetPos"])
     print("concatenate conditions")
-    conditions = pd.concat(leftConditions, rightConditions)
+    conditions = pd.concat(pd.DataFrame(leftConditions), pd.DataFrame(rightConditions)).to_dict()
     cfg["state"]["conditions"] = conditions
 
     # create a randomized list of trials unique to each participant ID
