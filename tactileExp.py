@@ -366,26 +366,30 @@ def runTrial(cfg):
         prevCondIdx = cfg['state']['trialOrder'][trialNumber-1]
         startPos = cfg['state']['conditions']['targetPos'][prevCondIdx]
     else:
-        startPos = [0, 0] 
-        # if tuple(targetPos) in cfg['state']['leftTargets']:
+        # startPos = [0, 0] 
+        if tuple(targetPos) in cfg['state']['leftTargets']:
 
-        #     #randomly pick a right Target
+            # randomly pick a right Target
 
-        #     startPos = random.sample(cfg['state']['rightTargets'], 1)
+            startPos = random.sample(cfg['state']['rightTargets'], 1)
 
-        # else:
+        else:
 
-        #     # randomly pick a left Target
+            # randomly pick a left Target
 
-        #     startPos = random.sample(cfg['state']['leftTargets'], 1)
+            startPos = random.sample(cfg['state']['leftTargets'], 1)
     print("assigning positions")
     cfg['bin']['target'].pos = targetPos
+    cfg['bin']['target'].radius = targetSize
     cfg['bin']['start'].pos = startPos
     print("make rotation matrix")
     theta = -1 * np.arctan2(targetPos[1] - startPos[1],targetPos[0] - startPos[0])
     R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
 
     runningTrial = True
+
+    phase = 0
+
     print("start while loop")
     while runningTrial:
 
@@ -393,9 +397,30 @@ def runTrial(cfg):
         cursorPos = [x,y]
         cfg['bin']['cursor'].pos = cursorPos
 
-        distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
-        if distance < 0.5:
+        if phase == 3:
             runningTrial = False
+        
+        if phase == 2:
+            # check if hold is complete
+            if (time.time() > (holdStartTime + 0.1)):
+                phase = 3
+
+        if phase == 1:
+            #check if target has been reached
+            distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
+            if distance < targetPos.radius:
+                holdStartTime = time.time()
+                phase = 2
+
+        if phase == 0:
+            # check if cursor is in the home position
+            distance = ((cursorPos[0]-startPos[0])**2+(cursorPos[1]-startPos[1])**2)**0.5
+            if distance < startPos.radius:
+                phase = 1
+
+        # distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
+        # if distance < 0.5:
+        #     runningTrial = False
         cfg['bin']['target'].draw()
         cfg['bin']['start'].draw()
         cfg['bin']['cursor'].draw()
