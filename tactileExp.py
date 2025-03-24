@@ -383,6 +383,8 @@ def runTrial(cfg):
     cfg['bin']['target'].radius = targetSize
     cfg['bin']['start'].pos = startPos
     print("make rotation matrix")
+    print(targetPos)
+    print(startPos)
     theta = -1 * np.arctan2(targetPos[1] - startPos[1],targetPos[0] - startPos[0])
     R = np.array([[np.cos(theta),-1*np.sin(theta)],[np.sin(theta),np.cos(theta)]],order='C')
 
