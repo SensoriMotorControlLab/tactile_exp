@@ -337,6 +337,7 @@ def setupTasks(cfg):
     return(cfg)
 
 def runTasks(cfg):
+    print("runTasks")
 
     for trialNumber in range(len(cfg["state"]["trialOrder"])):
         cfg['state']['trialNumber'] = trialNumber
