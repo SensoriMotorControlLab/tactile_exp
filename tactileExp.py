@@ -356,7 +356,7 @@ def runTrial(cfg):
     targetSize = cfg['state']['conditions']['targetSize'][trialNumber]
     tactileStim = cfg['state']['conditions']['tactileStim'][trialNumber]
     targetPos = cfg['state']['conditions']['targetPos'][trialNumber]
-
+    print("getting start pos")
     if trialNumber > 0:
         startPos = cfg['state']['conditions']['targetPos'][trialNumber-1]
     else: 
