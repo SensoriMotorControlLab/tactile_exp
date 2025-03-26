@@ -264,20 +264,7 @@ def setupStimuli(cfg):
 
     return(cfg)
 
-def runTrial(cfg):
-    # read in trial info from cfg
-    # current trial number (variable)
-    # look up condition (in condition order list)
-    # defintion of conditions
-    # columns = start position, end position, target size, tactile stim
-    # run while loop
-    # store data with trial number in folder
-    # independent variables plus participant dependent variables (movement time)
 
-
-
-
-    return(cfg)
 
 def foldout(values, names):
     # http://code.activestate.com/recipes/496807-list-of-all-combination-from-multiple-lists/
@@ -353,8 +340,10 @@ def runTasks(cfg):
     return(cfg)
 
 def runTrial(cfg):
+
     trialNumber =  cfg['state']['trialNumber']
     print(trialNumber)
+
     condIdx = cfg['state']['trialOrder'][trialNumber]
     targetSize = cfg['state']['conditions']['targetSize'][condIdx]
     tactileStim = cfg['state']['conditions']['tactileStim'][condIdx]
@@ -391,6 +380,12 @@ def runTrial(cfg):
     runningTrial = True
 
     phase = 0
+
+    # create lists to store data in:
+    stylusX = []
+    stylusY = []
+    time_s = []
+    phases = []
 
     print("start while loop")
     while runningTrial:
@@ -433,7 +428,39 @@ def runTrial(cfg):
         # cfg['bin']['start'].draw()
         # cfg['bin']['cursor'].draw()
         cfg['bin']['win'].flip()
+
+        # add data sample for the current frame:
+        stylusX.append(x)
+        stylusY.append(y)
+        time_s.append(t)
+        phases.append(phase)
     
+    # collect all data in matrix/dictionary?
+    nsamples = len(time_s)
+
+    trial_idx = [trialNumber+1] * nsamples
+    targetx = [targetPos[0]] * nsamples
+    targety = [targetPos[1]] * nsamples
+
+
+
+    # put all lists in dictionary:
+    trialdata = { 'trial_idx'        : trial_idx,
+                  'targetx_cm'       : targetx,
+                  'targety_cm'       : targety,
+                  'phase'            : phases,      
+                  'time_ms'          : time_ms,
+                  'stylusx_cm'        : stylusX,
+                  'stylusy_cm'        : stylusY,
+                  }
+
+    # make dictionary into data frame:
+    trialdata = pd.DataFrame(trialdata)
+
+    # store data frame:
+    filename = 'data/%s/trial%04d.csv'%(cfg['ID'],cfg['trialno']+1)
+    trialdata.to_csv( filename, index=False, float_format='%0.5f' )
+
 
     return(cfg)
 
