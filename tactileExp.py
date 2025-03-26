@@ -458,7 +458,7 @@ def runTrial(cfg):
     trialdata = pd.DataFrame(trialdata)
 
     # store data frame:
-    filename = 'data/%s/trial%04d.csv'%(cfg['ID'],cfg['trialno']+1)
+    filename = 'data/%s/trial%04d.csv'%(cfg['state']['ID'],cfg['state']['trialNumber']+1)
     trialdata.to_csv( filename, index=False, float_format='%0.5f' )
 
 
