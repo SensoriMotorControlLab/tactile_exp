@@ -394,6 +394,11 @@ def runTrial(cfg):
         cursorPos = [x,y]
         cfg['bin']['cursor'].pos = cursorPos
 
+        stylusX.append(x)
+        stylusY.append(y)
+        time_s.append(t)
+        phases.append(phase)
+        
         if phase == 3:
             runningTrial = False
         
@@ -430,10 +435,7 @@ def runTrial(cfg):
         cfg['bin']['win'].flip()
 
         # add data sample for the current frame:
-        stylusX.append(x)
-        stylusY.append(y)
-        time_s.append(t)
-        phases.append(phase)
+
     
     # collect all data in matrix/dictionary?
     nsamples = len(time_s)
