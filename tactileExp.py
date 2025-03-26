@@ -398,17 +398,25 @@ def runTrial(cfg):
         stylusY.append(y)
         time_s.append(t)
         phases.append(phase)
-        
+
         if phase == 3:
             runningTrial = False
         
+        # after reaching the target, the participant needs to get to the next start position
+        # (which MAY be smaller than the target)
         if phase == 2:
             cfg['bin']['target'].draw()
             cfg['bin']['cursor'].draw()
-            # check if hold is complete
+            # check if hold-distance is maintained
+            distance = ((cursorPos[0]-targetPos[0])**2+(cursorPos[1]-targetPos[1])**2)**0.5
+            if distance > cfg['bin']['target'].radius:
+                phase = 1
+            # check if hold-time is complete
             if (time.time() > (holdStartTime + 0.1)):
                 phase = 3
 
+        # participant needs to move to the target
+        # cursor and target are shown
         if phase == 1:
             cfg['bin']['target'].draw()
             cfg['bin']['cursor'].draw()
@@ -418,6 +426,8 @@ def runTrial(cfg):
                 holdStartTime = time.time()
                 phase = 2
 
+        # at the start of the trial, participant needs to go to the start position
+        # strat position and cursor are shown
         if phase == 0:
             cfg['bin']['start'].draw()
             cfg['bin']['cursor'].draw()
