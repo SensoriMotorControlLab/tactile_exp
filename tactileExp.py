@@ -449,7 +449,7 @@ def runTrial(cfg):
                   'targetx_cm'       : targetx,
                   'targety_cm'       : targety,
                   'phase'            : phases,      
-                  'time_ms'          : time_ms,
+                  'time_s'          : time_s,
                   'stylusx_cm'        : stylusX,
                   'stylusy_cm'        : stylusY,
                   }
