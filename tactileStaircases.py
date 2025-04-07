@@ -340,7 +340,7 @@ def setupStaircases(cfg):
                                 minReversals = minReversals,
                                 idx = len(steps) - 1        )                                         
 
-    cfg['state']['staircases'] = [staircase1, staircase2]
+    cfg['bin']['staircases'] = [staircase1, staircase2]
 
     return(cfg)
 
@@ -371,7 +371,7 @@ def getrunningStaircases(staircases):
 
 def runStaircases(cfg):
 
-    runningStaircases = getrunningStaircases(cfg['state']['staircases'])
+    runningStaircases = getrunningStaircases(cfg['bin']['staircases'])
     while len(runningStaircases):
         
         runningStaircases += [-1] * len(runningStaircases)
@@ -380,7 +380,7 @@ def runStaircases(cfg):
             cfg['state']['currentStaircase'] = staircase_idx
             cfg = runDetectionTrial(cfg)
 
-        runningStaircases = getrunningStaircases(cfg['state']['staircases'])
+        runningStaircases = getrunningStaircases(cfg['bin']['staircases'])
 
     return(cfg)
 
@@ -392,7 +392,7 @@ def runDetectionTrial(cfg):
         intensity = 0
     else:
         # do a trial with a stimulus
-        intensity = cfg['state']['staircases'][staircase_idx].getValue()
+        intensity = cfg['bin']['staircases'][staircase_idx].getValue()
 
     # blank screen
     blank = 0.2
@@ -432,9 +432,9 @@ def runDetectionTrial(cfg):
         # quit task
         pass
     if k[0] in ['left']:
-        cfg['state']['staircases'][staircase_idx].update(+1)
+        cfg['bin']['staircases'][staircase_idx].update(+1)
     if k[0] in ['right']:
-        cfg['state']['staircases'][staircase_idx].update(-1)
+        cfg['bin']['staircases'][staircase_idx].update(-1)
 
     # store data
 
