@@ -395,7 +395,7 @@ def runDetectionTrial(cfg):
         intensity = cfg['bin']['staircases'][staircase_idx].getValue()
 
     # blank screen
-    blank = 0.2
+    blank = 0.5
     # stimulus cue
     # wait interval
     # stimulus jitter
