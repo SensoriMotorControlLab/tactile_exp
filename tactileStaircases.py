@@ -42,7 +42,9 @@ def runExperiment(ID=None):
 
         cfg = prepare(cfg)
 
-        cfg = runTasks(cfg)
+        # cfg = runTasks(cfg)
+
+        cfg = runStaircases(cfg)
 
     except Exception as e:
 
@@ -77,7 +79,9 @@ def prepare(cfg):
 
     cfg = setupEnvironment(cfg)
 
-    cfg = setupTasks(cfg)
+    # cfg = setupTasks(cfg)
+
+    cfg = setupStaircases(cfg)
 
     print("preparation finished")
 
@@ -233,7 +237,7 @@ def setupStimuli(cfg):
 
     # 1. a cursor (circle)
     cfg['bin']['cursor'] = visual.Circle(  win=cfg['bin']['win'], 
-                                    radius=0.25, 
+                                    radius=1, 
                                     lineWidth=0, 
                                     lineColorSpace='rgb', 
                                     lineColor=None, 
@@ -281,61 +285,156 @@ def foldout(values, names):
     df.columns = names
     return(df.to_dict())
 
-def setupTasks(cfg):
+# def setupTasks(cfg):
 
-    leftTargets = [(-10, 5), (-10, -5)]
-    rightTargets = [(10, 5), (10, -5)]
+#     leftTargets = [(-10, 5), (-10, -5)]
+#     rightTargets = [(10, 5), (10, -5)]
 
-    cfg['state']['leftTargets'] = leftTargets
-    cfg['state']['rightTargets'] = rightTargets
+#     cfg['state']['leftTargets'] = leftTargets
+#     cfg['state']['rightTargets'] = rightTargets
 
-    # master list of all conditions, positon, size, tactile stim
-    leftConditions = foldout(values = [[1, 0.5], 
-                                    [False, 1/3, 2/3], 
-                                    leftTargets],
-                         names = ["targetSize", "tactileStim", "targetPos"])
-    rightConditions = foldout(values = [[1, 0.5], 
-                                    [False, 1/3, 2/3], 
-                                    rightTargets],
-                         names = ["targetSize", "tactileStim", "targetPos"])
-    conditions = pd.concat([pd.DataFrame(leftConditions), pd.DataFrame(rightConditions)], ignore_index = True).to_dict()
-    cfg["state"]["conditions"] = conditions
+#     # master list of all conditions, positon, size, tactile stim
+#     leftConditions = foldout(values = [[1, 0.5], 
+#                                     [False, 1/3, 2/3], 
+#                                     leftTargets],
+#                          names = ["targetSize", "tactileStim", "targetPos"])
+#     rightConditions = foldout(values = [[1, 0.5], 
+#                                     [False, 1/3, 2/3], 
+#                                     rightTargets],
+#                          names = ["targetSize", "tactileStim", "targetPos"])
+#     conditions = pd.concat([pd.DataFrame(leftConditions), pd.DataFrame(rightConditions)], ignore_index = True).to_dict()
+#     cfg["state"]["conditions"] = conditions
 
-    # create a randomized list of trials unique to each participant ID
+#     # create a randomized list of trials unique to each participant ID
 
-    Nconditions = len(conditions[list(conditions.keys())[0]])
-    CondIdxOne = list(range(int(Nconditions/2)))
-    CondIdxTwo = list(range(int(Nconditions/2), Nconditions))
-    if random.sample([True, False],1):
-        CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
+#     Nconditions = len(conditions[list(conditions.keys())[0]])
+#     CondIdxOne = list(range(int(Nconditions/2)))
+#     CondIdxTwo = list(range(int(Nconditions/2), Nconditions))
+#     if random.sample([True, False],1):
+#         CondIdxOne, CondIdxTwo = CondIdxTwo, CondIdxOne
 
-    # two pseudo-randomized blocks
+#     # two pseudo-randomized blocks
 
-    trialOrder = []
-    for blockNo in range(2):
-        random.shuffle(CondIdxOne)
-        random.shuffle(CondIdxTwo)
-        for Idx in range(len(CondIdxOne)):
-            trialOrder.append(CondIdxOne[Idx])
-            trialOrder.append(CondIdxTwo[Idx])
+#     trialOrder = []
+#     for blockNo in range(2):
+#         random.shuffle(CondIdxOne)
+#         random.shuffle(CondIdxTwo)
+#         for Idx in range(len(CondIdxOne)):
+#             trialOrder.append(CondIdxOne[Idx])
+#             trialOrder.append(CondIdxTwo[Idx])
 
-    cfg["state"]["trialOrder"] = trialOrder
+#     cfg["state"]["trialOrder"] = trialOrder
+
+#     return(cfg)
+
+def setupStaircases(cfg):
+    steps = [1,2,3,4,5]
+    minTrials = 30
+    minReversals = 10
+    staircase1 = SimpleStaircase(steps = steps,
+                                minTrials = minTrials,
+                                minReversals = minReversals,
+                                idx = 0                     )
+    staircase2 = SimpleStaircase(steps = steps,
+                                minTrials = minTrials,
+                                minReversals = minReversals,
+                                idx = len(steps) - 1        )                                         
+
+    cfg['state']['staircases'] = [staircase1, staircase2]
 
     return(cfg)
 
-def runTasks(cfg):
-    print("runTasks")
-    print(len(cfg["state"]["trialOrder"]))
-    trialOrder = cfg['state']['trialOrder']
-    nTrials = len(trialOrder)
-    for trialNumber in range(nTrials):
-        print(trialNumber)
-        cfg['state']['trialNumber'] = trialNumber
+# def runTasks(cfg):
+#     print("runTasks")
+#     print(len(cfg["state"]["trialOrder"]))
+#     trialOrder = cfg['state']['trialOrder']
+#     nTrials = len(trialOrder)
+#     for trialNumber in range(nTrials):
+#         print(trialNumber)
+#         cfg['state']['trialNumber'] = trialNumber
 
-        # show instructions if applicable
+#         # show instructions if applicable
 
-        cfg = runTrial(cfg)
-       #  cfg = saveState(cfg)
+#         cfg = runTrial(cfg)
+#        #  cfg = saveState(cfg)
+
+#     return(cfg)
+
+def getrunningStaircases(staircases):
+
+    runningStaircases = []
+    for i in range(len(staircases)):
+        if staircases[i].running:
+            runningStaircases.append(i)
+
+    return(runningStaircases)
+
+def runStaircases(cfg):
+
+    runningStaircases = getrunningStaircases(cfg['state']['staircases'])
+    while len(runningStaircases):
+        
+        runningStaircases += [-1] * len(runningStaircases)
+        random.shuffle(runningStaircases)
+        for staircase_idx in runningStaircases:
+            cfg['state']['currentStaircase'] = staircase_idx
+            cfg = runDetectionTrial(cfg)
+
+        runningStaircases = getrunningStaircases(cfg['state']['staircases'])
+
+    return(cfg)
+
+def runDetectionTrial(cfg):
+
+    staircase_idx = cfg['state']['currentStaircase']
+    if staircase_idx < 0:
+        # do a trial without a stimulus
+        intensity = 0
+    else:
+        # do a trial with a stimulus
+        intensity = cfg['state']['staircases'][staircase_idx].getValue()
+
+    # blank screen
+    blank = 0.2
+    # stimulus cue
+    # wait interval
+    # stimulus jitter
+    jitter = random.uniform(0, 1)
+    # stimulus presentation
+    stimulusTime = blank + jitter + 0.5
+    # response cue
+    cueTime = blank + 2
+    # get response
+    # store data and end trial
+    startTime = time.time()
+
+    presentStimulus = True
+    cfg['bin']['cursor'].fillColor = '#ff0000'
+
+    while presentStimulus:
+        now = time.time()
+        if now > (startTime + stimulusTime):
+            # do tactile stimulation
+        if now > (startTime + cueTime):
+            cfg['bin']['cursor'].fillColor = '#0000ff'
+            presentStimulus = False
+        if now > (startTime + blank):
+            cfg['bin']['cursor'].draw()
+        cfg['bin']['win'].flip()
+    
+    # wait for response
+    k = ['wait']
+
+    while k[0] not in ['left', 'right', 'q']:
+        k = event.waitKeys()
+    if k[0] in ['q']:
+        # quit task
+    if k[0] in ['left']:
+        cfg['state']['staircases'][staircase_idx].update(+1)
+    if k[0] in ['right']:
+        cfg['state']['staircases'][staircase_idx].update(-1)
+
+    # store data
 
     return(cfg)
 
