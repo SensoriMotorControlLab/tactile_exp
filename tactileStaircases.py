@@ -513,7 +513,7 @@ class SimpleStaircase:
         self.idx += response
         if self.idx < 0:
             self.idx = 0
-        if self.idx => len(self.steps):
+        if self.idx >= len(self.steps):
             self.idx = len(self.steps) - 1
         if len(self.responses) > 1:
             status = False
