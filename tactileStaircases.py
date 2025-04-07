@@ -436,7 +436,7 @@ def runDetectionTrial(cfg):
     if k[0] in ['right']:
         cfg['bin']['staircases'][staircase_idx].update(-1)
 
-    # store data
+    # store data in different location from movement task data
 
     return(cfg)
 
