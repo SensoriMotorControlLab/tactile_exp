@@ -415,6 +415,7 @@ def runDetectionTrial(cfg):
         now = time.time()
         if now > (startTime + stimulusTime):
             # do tactile stimulation
+            pass
         if now > (startTime + cueTime):
             cfg['bin']['cursor'].fillColor = '#0000ff'
             presentStimulus = False
