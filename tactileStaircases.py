@@ -430,6 +430,7 @@ def runDetectionTrial(cfg):
         k = event.waitKeys()
     if k[0] in ['q']:
         # quit task
+        pass
     if k[0] in ['left']:
         cfg['state']['staircases'][staircase_idx].update(+1)
     if k[0] in ['right']:
