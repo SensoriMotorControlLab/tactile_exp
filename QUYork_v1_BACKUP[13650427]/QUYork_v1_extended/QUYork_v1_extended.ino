@@ -6,8 +6,8 @@
 int selectedMotor = -1; // No motor selected initially
 int motorStrength[3] = {0x00, 0x00, 0x00}; // Motor strengths for motors 0, 1, and 2
 int motorDuration = 200; // Vibration duration in milliseconds (default 0.2 seconds)
-String vibrationStrengthName[3] = {"No vibration", "No vibration", "No vibration"}; // Vibration strength names for motors 0, 1, and 2
-int vibrationStrenth = 0x00;
+//String vibrationStrengthName[3] = {"No vibration", "No vibration", "No vibration"}; // Vibration strength names for motors 0, 1, and 2
+int vibrationStrenth = 0; // do we need this at all? we can just set the int motorStrength directly...
 
 // Motor driver variable
 Adafruit_DRV2605 drv;
@@ -76,11 +76,12 @@ void setup() {
   buzz(1, 0x20);  // Changed to 0x20 for the smallest noticeable vibration
 
   // User guide message
-  Serial.println("1. Select motor: '0', '1', or '2'");
-  Serial.println("2. Select strength: 'S' followed by '0'-'5' (e.g., 'S3' for medium-low vibration)");
-  Serial.println("3. Select duration: 'D' followed by '1', '2', or '3' (e.g., 'D2' for 0.4 seconds)");
-  Serial.println("4. Run motor: 'G' followed by motor number (e.g., 'G1' to run motor 1)");
-  Serial.println("S0 is no vibration, 2 or G2 activates both motors");
+  Serial.println("Each command ends with a . (dot symbol)");
+  Serial.println("1. Select motor: 'M0.', 'M1.', or 'M2.'");
+  Serial.println("2. Set strength: 'S' followed by '0'-'128' (e.g., 'S3' for medium-low vibration)");
+  Serial.println("3. Set duration: 'D' followed by miliseconds, up to XXX, (e.g., 'D400.' for 0.4 seconds)");
+  Serial.println("4. Run motor: 'G' followed by motor number (e.g., 'G1.' to run motor 1)");
+  Serial.println("S0 is no vibration, G2. activates both motors");
 }
 
 void loop() {
@@ -103,34 +104,36 @@ void loop() {
     }
     
     
-//    // Select motor 0, 1, or 2
-//    if (input == '0') {
-//      selectedMotor = 0;
-//      Serial.print("Selected Motor 0, ");
-//      Serial.print("Strength: ");
-//      Serial.print(vibrationStrengthName[0]); // Display the current strength for motor 0
-//      Serial.print(", Duration: ");
-//      Serial.print(motorDuration);
-//      Serial.println("ms");
-//    }
-//    else if (input == '1') {
-//      selectedMotor = 1;
-//      Serial.print("Selected Motor 1, ");
-//      Serial.print("Strength: ");
-//      Serial.print(vibrationStrengthName[1]); // Display the current strength for motor 1
-//      Serial.print(", Duration: ");
-//      Serial.print(motorDuration);
-//      Serial.println("ms");
-//    }
-//    else if (input == '2') {
-//      selectedMotor = 2;
-//      Serial.print("Selected Motor 2 (both motors running simultaneously), ");
-//      Serial.print("Strength: ");
-//      Serial.print(vibrationStrengthName[2]); // Display the current strength for motor 2
-//      Serial.print(", Duration: ");
-//      Serial.print(motorDuration);
-//      Serial.println("ms");
-//    }
+    // Select motor 0, 1, or 2
+    if (input == '0') {
+      selectedMotor = 0;
+      Serial.print("Selected Motor 0, ");
+      Serial.print("Strength: ");
+      Serial.print(vibrationStrengthName[0]); // Display the current strength for motor 0
+      Serial.print(", Duration: ");
+      Serial.print(motorDuration);
+      Serial.println("ms");
+    }
+    else if (input == '1') {
+      selectedMotor = 1;
+      Serial.print("Selected Motor 1, ");
+      Serial.print("Strength: ");
+      Serial.print(vibrationStrengthName[1]); // Display the current strength for motor 1
+      Serial.print(", Duration: ");
+      Serial.print(motorDuration);
+      Serial.println("ms");
+    }
+    else if (input == '2') {
+      selectedMotor = 2;
+      Serial.print("Selected Motor 2 (both motors running simultaneously), ");
+      Serial.print("Strength: ");
+      Serial.print(vibrationStrengthName[2]); // Display the current strength for motor 2
+      Serial.print(", Duration: ");
+      Serial.print(motorDuration);
+      Serial.println("ms");
+    }
+
+    
 
     if (input.indexOf('S') >= 0)
     {
