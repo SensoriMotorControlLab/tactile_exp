@@ -4,10 +4,10 @@
 from psychopy import visual, event, monitors
 
 import numpy as np
-
 import random, os, sys, time, json
-
 import pandas as pd
+
+from serial import Serial
 
 
 def runExperiment(ID=None):
@@ -81,7 +81,7 @@ def prepare(cfg):
 
     # cfg = setupTasks(cfg)
 
-    cfg = setupStaircases(cfg)
+    cfg = setupStaircases(cfg) # includes response dictionary?
 
     print("preparation finished")
 
@@ -144,6 +144,8 @@ def setupEnvironment(cfg):
     cfg = setupPsychopyWindow(cfg)
 
     cfg = setupTabletTracker(cfg)
+
+    cfg = setupTVFU(cfg)
 
     cfg = setupStimuli(cfg)
 
@@ -227,6 +229,17 @@ def setupTabletTracker(cfg):
     # so that we also know exactly when the participant did the task
 
     cfg['bin']["tracker"] = myMouse(cfg)
+
+    return(cfg)
+
+def setupTVFU(cfg):
+
+    # this is assumed to be the Arduino-based Tactile Vibration Feedback Unit
+    # running on our modified / extended version of the Arduino sketch
+    # that allows setting intensity and duration as any allowed value
+
+    cfg['bin']['TVFU'] = Serial( port     = '/dev/ttyACM0',
+                                 baudrate = 115200          )
 
     return(cfg)
 
@@ -328,19 +341,38 @@ def foldout(values, names):
 #     return(cfg)
 
 def setupStaircases(cfg):
-    steps = [1,2,3,4,5]
+    
+    # steps =  [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200] # 16 durations in miliseconds
+    steps =  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75] # 15 durations in miliseconds
+    
     minTrials = 30
     minReversals = 10
+
+    info = {'motor'     : 2,
+            'strength'  : 63,
+            'stepvalue' : 'duration'}
+
     staircase1 = SimpleStaircase(steps = steps,
-                                minTrials = minTrials,
-                                minReversals = minReversals,
-                                idx = 0                     )
+                                 minTrials = minTrials,
+                                 minReversals = minReversals,
+                                 idx = 0,
+                                 info = info                     )
+
     staircase2 = SimpleStaircase(steps = steps,
-                                minTrials = minTrials,
-                                minReversals = minReversals,
-                                idx = len(steps) - 1        )                                         
+                                 minTrials = minTrials,
+                                 minReversals = minReversals,
+                                 idx = len(steps) - 1,
+                                 info = info                     )                                         
 
     cfg['bin']['staircases'] = [staircase1, staircase2]
+
+    cfg['state']['responses'] = {'trial'      : [],
+                                 'staircase'  : [],
+                                 'strength'   : [],
+                                 'duration'   : [],
+                                 'timejitter' : [],
+                                 'response'   : [],
+                                 }
 
     return(cfg)
 
@@ -372,13 +404,18 @@ def getrunningStaircases(staircases):
 def runStaircases(cfg):
 
     runningStaircases = getrunningStaircases(cfg['bin']['staircases'])
+
+    cfg['state']['currenttrial'] = 1
+
     while len(runningStaircases):
         
-        runningStaircases += [-1] * len(runningStaircases)
+        runningStaircases += [-1] * int(np.ceil(len(runningStaircases)/2))
+
         random.shuffle(runningStaircases)
         for staircase_idx in runningStaircases:
             cfg['state']['currentStaircase'] = staircase_idx
             cfg = runDetectionTrial(cfg)
+            cfg['state']['currenttrial'] += 1
 
         runningStaircases = getrunningStaircases(cfg['bin']['staircases'])
 
@@ -389,10 +426,37 @@ def runDetectionTrial(cfg):
     staircase_idx = cfg['state']['currentStaircase']
     if staircase_idx < 0:
         # do a trial without a stimulus
-        intensity = 0
+        prepcommand = 'M2.S0.D0.'
+        motor = 2
+        strength = 0
+        duration = 0
+
     else:
         # do a trial with a stimulus
-        intensity = cfg['bin']['staircases'][staircase_idx].getValue()
+        stepvalue = cfg['bin']['staircases'][staircase_idx].getValue()
+
+        prepcommand = ''
+        info = cfg['bin']['staircases'][staircase_idx].info
+        if 'motor' in info.keys():
+            motor = info['motor']
+        else:
+            motor = 2 # default to both motors?
+        if 'strength' in info.keys():
+            strength = info['strength'] # check valid value? (0-127)
+        else:
+            pass # is there a reasonable default?
+        if 'duration' in info.keys():
+            duration = info['duration']
+
+        # assign these after defaults, such that staircase values are not overruled by defaults:
+        if info['stepvalue'] == 'strength':
+            strength = stepvalue
+        if info['stepvalue'] == 'duration':
+            duration = stepvalue
+        
+        prepcommand += 'M%d.S%d.D%d.'%(motor, strength, duration)
+
+    cfg['bin']['TVFU'].write(bytes(prepcommand, 'utf-8'))
 
     # blank screen
     blank = 0.5
@@ -401,7 +465,7 @@ def runDetectionTrial(cfg):
     # stimulus jitter
     jitter = random.uniform(0, 1)
     # stimulus presentation
-    stimulusTime = blank + jitter + 0.5
+    stimulusOnset = blank + jitter
     # response cue
     cueTime = blank + 2
     # get response
@@ -409,16 +473,22 @@ def runDetectionTrial(cfg):
     startTime = time.time()
 
     presentStimulus = True
+    inStimulusInterval = True
     cfg['bin']['cursor'].fillColor = '#ff0000'
 
-    while presentStimulus:
+
+    while inStimulusInterval:
         now = time.time()
-        if now > (startTime + stimulusTime):
+        if now > (startTime + stimulusOnset):
             # do tactile stimulation
+            if (presentStimulus):
+                presentStimulus = False
+                cfg['bin']['TVFU'].write(bytes('G2.', 'utf-8'))
+
             pass
         if now > (startTime + cueTime):
             cfg['bin']['cursor'].fillColor = '#0000ff'
-            presentStimulus = False
+            inStimulusInterval = False
         if now > (startTime + blank):
             cfg['bin']['cursor'].draw()
         cfg['bin']['win'].flip()
@@ -426,17 +496,45 @@ def runDetectionTrial(cfg):
     # wait for response
     k = ['wait']
 
+    # left  = no stimulus detected  -> go up the staircase
+    # right = detected stimulus     -> go down the staircase
+
     while k[0] not in ['left', 'right', 'q']:
         k = event.waitKeys()
     if k[0] in ['q']:
-        # quit task
-        pass
+        # quit task?
+        response = -1
+        pass # for now
     if k[0] in ['left']:
-        cfg['bin']['staircases'][staircase_idx].update(+1)
+        response = 0
+        if staircase_idx >= 0:
+            cfg['bin']['staircases'][staircase_idx].update(+1)
     if k[0] in ['right']:
-        cfg['bin']['staircases'][staircase_idx].update(-1)
+        response = 1
+        if staircase_idx >= 0:
+            cfg['bin']['staircases'][staircase_idx].update(-1)
+
+    # cfg['state']['responses'] = {'trial'      = [],
+    #                              'staircase'  = [],
+    #                              'strength'   = [],
+    #                              'duration'   = [],
+    #                              'timejitter' = [],
+    #                              'response'   = [],
+    #                              }
+
+    cfg['state']['responses']['trial'].append(cfg['state']['currenttrial'])
+    cfg['state']['responses']['staircase'].append(staircase_idx)
+    cfg['state']['responses']['strength'].append(strength)
+    cfg['state']['responses']['duration'].append(duration)
+    cfg['state']['responses']['timejitter'].append(jitter)
+    cfg['state']['responses']['response'].append(response)
+
+    pd.DataFrame(cfg['state']['responses']).to_csv('%s/S63_duration_staircases.csv'%(cfg['state']['dataFolder']), index=False)
+
+
 
     # store data in different location from movement task data
+
 
     return(cfg)
 
@@ -597,11 +695,12 @@ def closeEnvironment(cfg):
 
 
 class SimpleStaircase:
-    def __init__(self,steps,idx,minTrials,minReversals):
+    def __init__(self,steps,idx,minTrials,minReversals,info):
         self.steps = steps
         self.idx = idx
         self.minTrials = minTrials
         self.minReversals = minReversals
+        self.info = info # arbitrary properties: put a dictionary or list for multiple bits of info
 
         self.running = True
         self.responses = []
