@@ -343,28 +343,32 @@ def foldout(values, names):
 def setupStaircases(cfg):
     
     # steps =  [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200] # 16 durations in miliseconds
-    steps =  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75] # 15 durations in miliseconds
+    # steps =  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75] # 15 durations in miliseconds
+    steps = [6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66] # 21 durations ?
     
-    minTrials = 30
-    minReversals = 10
+    minTrials = 24
+    minReversals = 8
 
-    info = {'motor'     : 2,
-            'strength'  : 63,
-            'stepvalue' : 'duration'}
+    staircases = []
 
-    staircase1 = SimpleStaircase(steps = steps,
-                                 minTrials = minTrials,
-                                 minReversals = minReversals,
-                                 idx = 0,
-                                 info = info                     )
+    for strength in  [31, 39, 47, 55, 63] :
 
-    staircase2 = SimpleStaircase(steps = steps,
-                                 minTrials = minTrials,
-                                 minReversals = minReversals,
-                                 idx = len(steps) - 1,
-                                 info = info                     )                                         
+        info = {'motor'     : 2,
+                'strength'  : strength,
+                'stepvalue' : 'duration'}
 
-    cfg['bin']['staircases'] = [staircase1, staircase2]
+        staircases.append( SimpleStaircase( steps = steps,
+                                            minTrials = minTrials,
+                                            minReversals = minReversals,
+                                            idx = 0,
+                                            info = info                     ) )
+        staircases.append( SimpleStaircase( steps = steps,
+                                            minTrials = minTrials,
+                                            minReversals = minReversals,
+                                            idx = len(steps) - 1,
+                                            info = info                     ) )
+
+    cfg['bin']['staircases'] = staircases
 
     cfg['state']['responses'] = {'trial'      : [],
                                  'staircase'  : [],
@@ -409,7 +413,8 @@ def runStaircases(cfg):
 
     while len(runningStaircases):
         
-        runningStaircases += [-1] * int(np.ceil(len(runningStaircases)/2))
+        # no non-stimulus trials?
+        # runningStaircases += [-1] * int(np.ceil(len(runningStaircases)/2))
 
         random.shuffle(runningStaircases)
         for staircase_idx in runningStaircases:
