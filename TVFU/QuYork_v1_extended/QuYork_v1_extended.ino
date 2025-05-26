@@ -7,7 +7,8 @@ int selectedMotor = -1; // No motor selected initially
 int motorStrength[3] = {0x00, 0x00, 0x00}; // Motor strengths for motors 0, 1, and 2
 int motorDuration = 200; // Vibration duration in milliseconds (default 0.2 seconds)
 //String vibrationStrengthName[3] = {"No vibration", "No vibration", "No vibration"}; // Vibration strength names for motors 0, 1, and 2
-uint8_t vibrationStrenth = 0; // do we need this at all? we can just set the int motorStrength directly...
+//int vibrationStrenth = 0; // do we need this at all? we can just set the int motorStrength directly...
+bool verbosity = false;
 
 // Motor driver variable
 Adafruit_DRV2605 drv;
@@ -77,7 +78,8 @@ void setup() {
 
   // User guide message
   Serial.println("Each command ends with a . (dot symbol)");
-  Serial.println("1. Select motor: 'M0.', 'M1.', or 'M2.'");
+  Serial.println("A string of commands can be given at once.");
+  Serial.println("1. Select either motor or both: 'M0.', 'M1.', or 'M2.'");
   Serial.println("2. Set strength: 'S' followed by '0'-'128' (e.g., 'S53.' for medium-low vibration)");
   Serial.println("3. Set duration: 'D' followed by miliseconds (e.g., 'D400.' for 0.4 seconds)");
   Serial.println("4. Run motor: 'G' followed by motor number (e.g., 'G1.' to run motor 1)");
@@ -104,14 +106,15 @@ void loop() {
 
       selectedMotor = input.toInt();
 
-      Serial.print("Set motor: ");
-      Serial.print(selectedMotor);
-      Serial.print(", Strength: ");
-      Serial.print(motorStrength[selectedMotor]);
-      Serial.print(", Duration: ");
-      Serial.print(motorDuration);
-      Serial.println(" ms");
-
+      if (verbosity) {
+        Serial.print("Set motor: ");
+        Serial.print(selectedMotor);
+        Serial.print(", Strength: ");
+        Serial.print(motorStrength[selectedMotor]);
+        Serial.print(", Duration: ");
+        Serial.print(motorDuration);
+        Serial.println(" ms");
+      }
       
     }
     
@@ -124,13 +127,15 @@ void loop() {
 
       motorStrength[selectedMotor] = input.toInt();
 
-      Serial.print("Set motor: ");
-      Serial.print(selectedMotor);
-      Serial.print(", Strength: ");
-      Serial.print(motorStrength[selectedMotor]);
-      Serial.print(", Duration: ");
-      Serial.print(motorDuration);
-      Serial.println(" ms");
+      if (verbosity) {
+        Serial.print("Set motor: ");
+        Serial.print(selectedMotor);
+        Serial.print(", Strength: ");
+        Serial.print(motorStrength[selectedMotor]);
+        Serial.print(", Duration: ");
+        Serial.print(motorDuration);
+        Serial.println(" ms");
+      }
       
     }
     
@@ -146,13 +151,15 @@ void loop() {
 
       motorDuration = input.toInt();
 
-      Serial.print("Set motor: ");
-      Serial.print(selectedMotor);
-      Serial.print(", strength: ");
-      Serial.print(motorStrength[selectedMotor]);
-      Serial.print(", duration: ");
-      Serial.print(motorDuration);
-      Serial.println(" ms");
+      if (verbosity) {
+        Serial.print("Set motor: ");
+        Serial.print(selectedMotor);
+        Serial.print(", Strength: ");
+        Serial.print(motorStrength[selectedMotor]);
+        Serial.print(", Duration: ");
+        Serial.print(motorDuration);
+        Serial.println(" ms");
+      }
 
     }
 
@@ -178,16 +185,28 @@ void loop() {
         
       }
 
-      Serial.print("Activated motor: ");
-      Serial.print(selectedMotor);
-      Serial.print(", Strength: ");
-      Serial.print(motorStrength[selectedMotor]);
-      Serial.print(", Duration: ");
-      Serial.print(motorDuration);
-      Serial.println(" ms");
-
-
+      if (verbosity) {
+        Serial.print("Activated motor: ");
+        Serial.print(selectedMotor);
+        Serial.print(", Strength: ");
+        Serial.print(motorStrength[selectedMotor]);
+        Serial.print(", Duration: ");
+        Serial.print(motorDuration);
+        Serial.println(" ms");
+      }
       
+    }
+
+    if (input.indexOf('V') >= 0)
+    {
+      input.remove(0,1); // index 0, remove 1 char
+
+      verbosity = input.toInt();
+
+      if (verbosity) {
+        Serial.println("Verbosity: true");
+      }
+
     }
 
 
