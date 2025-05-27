@@ -350,22 +350,32 @@ def setupStaircases(cfg):
 
     staircases = []
 
-    for duration in  [15, 20, 25, 30, 35, 40, 45, 50]:
+    for duration in  [17, 25, 33, 42, 50]:
 
         info = {'motor'     : 2,
                 'duration'  : duration,
                 'stepvalue' : 'strength'}
 
-        staircases.append( SimpleStaircase( steps = steps,
-                                            minTrials = minTrials,
-                                            minReversals = minReversals,
-                                            idx = 0,
-                                            info = info                     ) )
-        staircases.append( SimpleStaircase( steps = steps,
-                                            minTrials = minTrials,
-                                            minReversals = minReversals,
-                                            idx = len(steps) - 1,
-                                            info = info                     ) )
+        staircases.append( DescreasingStepStaircase(
+            steps = steps,
+            idx = 0,
+            minTrials = minTrials,
+            minReversals = minReversals,
+            step = 8,
+            decrease = 1,
+            info = info
+            ) )
+        staircases.append( DescreasingStepStaircase(
+            steps = steps,
+            idx = len(steps) - 1,
+            minTrials = minTrials,
+            minReversals = minReversals,
+            step = 8,
+            decrease = 1,
+            info = info
+            ) )
+
+
 
     cfg['bin']['staircases'] = staircases
 
@@ -660,11 +670,11 @@ def runTrial(cfg):
 
 
     # put all lists in dictionary:
-    trialdata = { 'trial_idx'        : trial_idx,
-                  'targetx_cm'       : targetx,
-                  'targety_cm'       : targety,
-                  'phase'            : phases,      
-                  'time_s'          : time_s,
+    trialdata = { 'trial_idx'         : trial_idx,
+                  'targetx_cm'        : targetx,
+                  'targety_cm'        : targety,
+                  'phase'             : phases,      
+                  'time_s'            : time_s,
                   'stylusx_cm'        : stylusX,
                   'stylusy_cm'        : stylusY,
                   }
