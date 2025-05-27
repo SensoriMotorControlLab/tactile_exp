@@ -350,30 +350,32 @@ def setupStaircases(cfg):
 
     staircases = []
 
-    for duration in  [17, 25, 33, 42, 50]:
+    for duration in  [17, 33]:
 
         info = {'motor'     : 2,
                 'duration'  : duration,
                 'stepvalue' : 'strength'}
 
-        staircases.append( DescreasingStepStaircase(
-            steps = steps,
-            idx = 0,
-            minTrials = minTrials,
-            minReversals = minReversals,
-            step = 8,
-            decrease = 1,
-            info = info
+        staircases.append( UDStaircase(
+                steps        = steps,
+                idx          = 0,
+                minTrials    = minTrials,
+                minReversals = minReversals,
+                up           = 5,
+                down         = 1,
+                info         = info
             ) )
-        staircases.append( DescreasingStepStaircase(
-            steps = steps,
-            idx = len(steps) - 1,
-            minTrials = minTrials,
-            minReversals = minReversals,
-            step = 8,
-            decrease = 1,
-            info = info
+
+        staircases.append( UDStaircase(
+                steps        = steps,
+                idx          = len(steps) - 1,
+                minTrials    = minTrials,
+                minReversals = minReversals,
+                up           = 1,
+                down         = 5,
+                info         = info
             ) )
+
 
 
 
@@ -756,9 +758,9 @@ class UDStaircase:
     def update(self, response):
         self.responses.append(response)
         if response == 1:
-            self.idx += up
+            self.idx += self.up
         if response == -1:
-            self.idx -= down
+            self.idx -= self.down
         
         if self.idx < 0:
             self.idx = 0
@@ -811,4 +813,4 @@ class DescreasingStepStaircase:
                 status = True
             if len(self.responses) < self.minTrials:
                 status = True
-            self.running = status
+            self.running = statusup
