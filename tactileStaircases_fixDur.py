@@ -61,7 +61,7 @@ def runExperiment(ID=None):
         # experiment finished, do final steps:
 
         # we combine all trial data into a full description
-        cfg = combineData(cfg)
+        # cfg = combineData(cfg)
 
         # and maybe generate a summary with one line per trial?
         cfg = createSummary(cfg)
@@ -344,18 +344,23 @@ def setupStaircases(cfg):
     
     # steps =  [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200] # 16 durations in miliseconds
     # steps =  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75] # 15 durations in miliseconds
-    steps = [6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66] # 21 durations ?
+    # steps = [6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66] # 21 durations ?
+
+    steps = [47, 51, 55, 59, 63, 67, 71, 75, 79, 83, 87, 91, 95, 99, 103, 107, 111, 115, 119, 123, 127] # 21 strengths!
+
+    steps = [0, 3,  7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71, 75, 79]
+
     
-    minTrials = 24
-    minReversals = 8
+    minTrials = 30
+    minReversals = 10
 
     staircases = []
 
-    for strength in  [51, 54, 57, 60, 63] :
+    for duration in  [17, 33] :
 
         info = {'motor'     : 2,
-                'strength'  : strength,
-                'stepvalue' : 'duration'}
+                'duration'  : duration,
+                'stepvalue' : 'strength'}
 
         staircases.append( SimpleStaircase( steps = steps,
                                             minTrials = minTrials,

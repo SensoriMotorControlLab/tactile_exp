@@ -61,7 +61,7 @@ def runExperiment(ID=None):
         # experiment finished, do final steps:
 
         # we combine all trial data into a full description
-        cfg = combineData(cfg)
+        # cfg = combineData(cfg)
 
         # and maybe generate a summary with one line per trial?
         cfg = createSummary(cfg)
@@ -342,20 +342,19 @@ def foldout(values, names):
 
 def setupStaircases(cfg):
     
-    # steps =  [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200] # 16 durations in miliseconds
-    # steps =  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75] # 15 durations in miliseconds
-    steps = [6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66] # 21 durations ?
+    # varying strengths:
+    steps = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127]
     
-    minTrials = 24
+    minTrials = 20
     minReversals = 8
 
     staircases = []
 
-    for strength in  [51, 54, 57, 60, 63] :
+    for duration in  [15, 20, 25, 30, 35, 40, 45, 50]:
 
         info = {'motor'     : 2,
-                'strength'  : strength,
-                'stepvalue' : 'duration'}
+                'duration'  : duration,
+                'stepvalue' : 'strength'}
 
         staircases.append( SimpleStaircase( steps = steps,
                                             minTrials = minTrials,
@@ -723,6 +722,82 @@ class SimpleStaircase:
         if len(self.responses) > 1:
             status = False
             if sum(np.diff(self.responses) != 0) < self.minReversals:
+                status = True
+            if len(self.responses) < self.minTrials:
+                status = True
+            self.running = status
+
+class UDStaircase:
+    def __init__(self,steps,idx,minTrials,minReversals,up,down,info):
+        self.steps = steps
+        self.idx = idx
+        self.minTrials = minTrials
+        self.minReversals = minReversals
+        self.up = up
+        self.down = down
+        self.info = info # arbitrary properties: put a dictionary or list for multiple bits of info
+
+        self.running = True
+        self.responses = []
+
+    def getValue(self):
+        return(self.steps[self.idx])
+
+    def update(self, response):
+        self.responses.append(response)
+        if response == 1:
+            self.idx += up
+        if response == -1:
+            self.idx -= down
+        
+        if self.idx < 0:
+            self.idx = 0
+        if self.idx >= len(self.steps):
+            self.idx = len(self.steps) - 1
+        
+        if len(self.responses) > 1:
+            status = False
+            if sum(np.diff(self.responses) != 0) < self.minReversals:
+                status = True
+            if len(self.responses) < self.minTrials:
+                status = True
+            self.running = status
+
+class DescreasingStepStaircase:
+    def __init__(self,steps,idx,minTrials,minReversals,step,decrease,info):
+        self.steps = steps
+        self.idx = idx
+        self.minTrials = minTrials
+        self.minReversals = minReversals
+        self.step = step
+        self.decrease = decrease
+        self.info = info # arbitrary properties: put a dictionary or list for multiple bits of info
+
+        self.running = True
+        self.responses = []
+        self.reversals = 0
+
+    def getValue(self):
+        return(self.steps[self.idx])
+
+    def update(self, response):
+        self.responses.append(response)
+        if response == 1:
+            self.idx += self.step
+        if response == -1:
+            self.idx -= self.step
+        
+        if self.idx < 0:
+            self.idx = 0
+        if self.idx >= len(self.steps):
+            self.idx = len(self.steps) - 1
+        
+        if len(self.responses) > 1:
+            status = False
+            if sum(np.diff(self.responses) != 0) > self.reversals:
+                self.reversals += 1
+                self.step = max(1,self.step-self.decrease)
+            if self.reversals < self.minReversals:
                 status = True
             if len(self.responses) < self.minTrials:
                 status = True
