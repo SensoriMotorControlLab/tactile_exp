@@ -857,4 +857,4 @@ class DescreasingStepStaircase:
                 status = True
             if len(self.responses) < self.minTrials:
                 status = True
-            self.running = statusup
+            self.running = status
