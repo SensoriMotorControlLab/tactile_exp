@@ -7,11 +7,11 @@ getColors <- function() {
                rgb(127, 0,   216, 255, max = 255), # violet: 195, 255, 108
                rgb(0,   19,  136, 255, max = 255)) # blue:   164, 255, 68
   
-  cols.tr <- c(rgb(255, 147, 41,  32,  max = 255), # orange:  21, 255, 148
-               rgb(229, 22,  54,  32,  max = 255), # red:    248, 210, 126
-               rgb(207, 0,   216, 32,  max = 255), # pink:   211, 255, 108
-               rgb(127, 0,   216, 32,  max = 255), # violet: 195, 255, 108
-               rgb(0,   19,  136, 32,  max = 255)) # blue:   164, 255, 68
+  cols.tr <- c(rgb(255, 147, 41,  64,  max = 255), # orange:  21, 255, 148
+               rgb(229, 22,  54,  64,  max = 255), # red:    248, 210, 126
+               rgb(207, 0,   216, 64,  max = 255), # pink:   211, 255, 108
+               rgb(127, 0,   216, 64,  max = 255), # violet: 195, 255, 108
+               rgb(0,   19,  136, 64,  max = 255)) # blue:   164, 255, 68
   
   cols <- list()
   cols$op <- cols.op
@@ -32,7 +32,7 @@ plotFile <- function(filename, independent='duration') {
   
   # read the data
   df <- read.csv(filename, header=TRUE, stringsAsFactors=FALSE)
-  
+
   if (independent == 'duration') {
     groupby='strength'
   }
@@ -78,14 +78,18 @@ combinedPlot <- function(IDs, independent='strength', stimulated='back') {
     }
     if (stimulated == 'finger') {
       df <- read.csv(file=sprintf('data/data2/%s_decr/staircase_data.csv', ID), header=TRUE, stringsAsFactors=FALSE)
+      df <- df[df$trial > 12,] # remove first 30 trials
     }
     df <- df[,c('trial','staircase','strength','duration','timejitter','response')]
+    df$ID <- ID
     if (is.data.frame(data)) {
       data <- rbind(data, df)
     } else {
       data <- df
     }
   }
+  
+  df$weight <- 1
   
   if (independent == 'duration') {
     groupby='strength'
@@ -114,19 +118,29 @@ combinedPlot <- function(IDs, independent='strength', stimulated='back') {
     subdf <- df[df[[groupby]] == sub,]
     
     agg_resp <- aggregate(response ~ subdf[[independent]], data=subdf, FUN=mean)
+    agg_wght <- aggregate(weight   ~ subdf[[independent]], data=subdf, FUN=sum)
+    agg_resp <- merge(agg_resp, agg_wght, by.x=names(agg_resp)[1], by.y=names(agg_wght)[1])
     # plot the data
     # lines(agg_resp[[1]], agg_resp$response, type='b', pch=19, lwd=1, col=colors$op[sub_no])
     lines(agg_resp[[1]], agg_resp$response, lwd=1, col=colors$tr[sub_no])
     
     # subdf
     
-    ppar <- fit.mprobit(  x     = subdf[,independent],
-                          y     = subdf[,'response'], 
-                          start = c( 63, 15,  0.000001), 
-                          lower = c(  7,  1,  0),
-                          upper = c(120, 63,  0.000002), 
-                          maxit = 1000, 
-                          FUN   = mean)
+    data <- subdf[,c('ID','strength','response')]
+    names(data) <- c('ID','x','y')
+    
+    ppar <- fit.mprobit(  data    = data,
+                          IDs     = IDs,
+                          # x       = subdf[,independent],
+                          # y       = subdf[,'response'], 
+                          ## weights = agg_resp$weight, # NOT IMPLEMENTED!
+                          start   = c( 30,  5,  0.000001), 
+                          lower   = c(  1, .1,  0),
+                          upper   = c(127, 63,  0.000002), 
+                          maxit   = 1000, 
+                          FUN     = mean)
+    
+    print(ppar$par)
     
     Y <- mprobit(p=ppar$par, x=X)
 
