@@ -43,7 +43,7 @@ plotFile <- function(filename, independent='duration') {
   # create plot
   xrange <- range(df[[independent]])
   plot(NULL,NULL,
-       main='',xlab=independent,ylab='proportion yes responses',
+       main='',xlab=independent,ylab='proportion detected',
        xlim=xrange, ylim=c(0,1),
        ax=F,bty='n')
   
@@ -62,9 +62,78 @@ plotFile <- function(filename, independent='duration') {
     lines(agg_resp[[1]], agg_resp$response, lwd=1, col=colors$op[sub_no])
   }
   
-  legend(6,1,legend=groupbyvals, col=colors$op, lwd=1, bty='n', cex=0.8, title=groupby)
+  legend(6,1,legend=sprintf('%d ms',groupbyvals), col=colors$op, lwd=1, bty='n', cex=0.8, title=groupby)
   
   axis(side=1, at=seq(xrange[1], xrange[2], length.out=5), cex.axis=0.8)
   axis(side=2, at=c(0,0.5,1), cex.axis=0.8)
+  
+}
+
+combinedPlot <- function(IDs, independent='strength') {
+  
+  data <- NA
+  for (ID in IDs) {
+    df <- read.csv(file=sprintf('data/data/%s5up1down_D/staircase_data.csv', ID), header=TRUE, stringsAsFactors=FALSE)
+    df <- df[,c('trial','staircase','strength','duration','timejitter','response')]
+    if (is.data.frame(data)) {
+      data <- rbind(data, df)
+    } else {
+      data <- df
+    }
+  }
+  
+  if (independent == 'duration') {
+    groupby='strength'
+  }
+  if (independent == 'strength') {
+    groupby='duration'
+  }
+  
+  colors <- getColors()
+  
+  groupbyvals <- sort(unique(df[[groupby]]))
+  
+  
+  # create plot
+  xrange <- range(df[[independent]])
+  plot(NULL,NULL,
+       main='',xlab=independent,ylab='proportion detected',
+       xlim=xrange, ylim=c(0,1),
+       ax=F,bty='n')
+
+  
+  X <- seq(1,127,0.05)
+  
+  for (sub_no in c(1:length(groupbyvals))) {
+    sub = groupbyvals[sub_no]
+    subdf <- df[df[[groupby]] == sub,]
+    
+    agg_resp <- aggregate(response ~ subdf[[independent]], data=subdf, FUN=mean)
+    # plot the data
+    # lines(agg_resp[[1]], agg_resp$response, type='b', pch=19, lwd=1, col=colors$op[sub_no])
+    lines(agg_resp[[1]], agg_resp$response, lwd=1, col=colors$tr[sub_no])
+    
+    # subdf
+    
+    ppar <- fit.mprobit(  x     = subdf[,independent],
+                          y     = subdf[,'response'], 
+                          start = c( 63, 15,  0.000001), 
+                          lower = c(  7,  1,  0),
+                          upper = c(120, 63,  0.000002), 
+                          maxit = 1000, 
+                          FUN   = mean)
+    
+    Y <- mprobit(p=ppar$par, x=X)
+
+    lines(X, Y, lwd=1, col=colors$op[sub_no])
+    
+  }
+  
+  legend(6,1,legend=sprintf('%d ms',groupbyvals), col=colors$op, lwd=1, bty='n', cex=0.8, title=groupby)
+  
+  axis(side=1, at=seq(xrange[1], xrange[2], length.out=5), cex.axis=0.8)
+  axis(side=2, at=c(0,0.5,1), cex.axis=0.8)
+  
+  
   
 }
