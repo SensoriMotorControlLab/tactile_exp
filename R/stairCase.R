@@ -69,11 +69,16 @@ plotFile <- function(filename, independent='duration') {
   
 }
 
-combinedPlot <- function(IDs, independent='strength') {
+combinedPlot <- function(IDs, independent='strength', stimulated='back') {
   
   data <- NA
   for (ID in IDs) {
-    df <- read.csv(file=sprintf('data/data/%s5up1down_D/staircase_data.csv', ID), header=TRUE, stringsAsFactors=FALSE)
+    if (stimulated == 'back') {
+      df <- read.csv(file=sprintf('data/data/%s5up1down_D/staircase_data.csv', ID), header=TRUE, stringsAsFactors=FALSE)
+    }
+    if (stimulated == 'finger') {
+      df <- read.csv(file=sprintf('data/data2/%s_decr/staircase_data.csv', ID), header=TRUE, stringsAsFactors=FALSE)
+    }
     df <- df[,c('trial','staircase','strength','duration','timejitter','response')]
     if (is.data.frame(data)) {
       data <- rbind(data, df)
