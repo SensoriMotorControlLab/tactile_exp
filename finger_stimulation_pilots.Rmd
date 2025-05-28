@@ -14,29 +14,28 @@ source('R/stairCase.R')
 source('R/mprobit.R')
 ```
 
-
-We start with some simple vibro-tactile psychophysics experiments. The goal is to determine the threshold of perception for different "strengths" of vibration. Unfortunately, it seems that frequency and amplitude of vibrations co-vary.
-
-We ran a few labmates on 5-up / 1-down staircases. Two each for stimulation durations of 17, 25, 33, 41 and 50 ms. We should be able to get an idea of the point of subjective equivalence for each duration.
+To test the detection threshold for vibrations applied to the index finger of the dominant hand, we ran a pilot on a few labmates using staircases with decreasing step sizes. Four each for stimulation durations of 33, 50 and 67 ms. 
 
 ```{r}
-plotFile('data/data/alice5up1down_D/staircase_data.csv', independent = 'strength')
+plotFile('data/data2/alice_decr/staircase_data.csv', independent = 'strength')
 ```
-```{r}
-plotFile('data/data/seta5up1down_D/staircase_data.csv', independent = 'strength')
-```
-```{r}
-plotFile('data/data/marius5up1down_D/staircase_data.csv', independent = 'strength')
-```
-
-All look pretty similar, but with somewhat different PSE's. The data also appears to be quite noisy (and it was a quick and dirty taks). Nevertheless, we can combine all data and get a combined set of psychometric functions, one for each stimulus duration.
 
 ```{r}
-combinedPlot(IDs=c('alice','marius','seta'))
+plotFile('data/data2/denise_decr/staircase_data.csv', independent = 'strength')
+```
+```{r}
+plotFile('data/data2/marius_decr/staircase_data.csv', independent = 'strength')
 ```
 
-Seems like a 50 ms duration gets us a PSE of strength ~40. This leaves some room to increase both the strength of the stimulation as well as the duration.
+Again, we combine the data (for this plot the first 12 trials are removed as a "familiarization" period):
 
-This is already fairly long compared to the duration of a reach. E.g. if we want to measure suppression during the reach.
+```{r}
+combinedPlot(IDs=c('alice','marius','denise'), stimulated='finger')
+```
 
-Should we also test on the back of the hand?
+Overall PSEs are:
+
+33 ms: 65.1 strength
+50 ms: 52.0 strength
+67 ms: 42.3 strength
+
