@@ -55,3 +55,7 @@ rsconnect/
 *.png
 *.csv
 *.pdf
+
+
+# add python ignores:
+*.pyc
