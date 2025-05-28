@@ -55,7 +55,9 @@ rsconnect/
 *.png
 *.csv
 *.pdf
+*.zip
 
 
 # add python ignores:
 *.pyc
+__pycache__/*
