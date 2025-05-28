@@ -38,7 +38,7 @@ mprobit <- function(p, x) {
   
 }
 
-mprobit.nll <- function(p, x, y) {
+mprobit.nll <- function(p, x, y, w=NULL) {
   
   # p is a vector of parameters
   # the first two are the regular parameters of the normal distribution:
@@ -51,6 +51,14 @@ mprobit.nll <- function(p, x, y) {
   
   # x is a vector of values
   # y is a vector of values (0 or 1)
+  
+  # w is a vector of weights (optional, defaults to 1)
+  # needs to be integers
+  
+  if (!is.null(w)) {
+    x <- rep(x,w)
+    y <- rep(y,w)
+  }
   
   # probit is implemented in R as the pnorm function,
   # but we add bounds:
@@ -95,7 +103,7 @@ mprobit.nll <- function(p, x, y) {
 #' @param maxit The maximum number of iterations for the optimization.
 #' @param FUN The function to use for aggregation (default is `mean`).
 #' @export
-fit.mprobit <- function(IDs=NULL, data=NULL, x=NULL, y=NULL, start, lower, upper, maxit=1000, FUN=mean) {
+fit.mprobit <- function(IDs=NULL, data=NULL, x=NULL, y=NULL, weights=NULL, start, lower, upper, maxit=1000, FUN=mean) {
   
   # this function will fit a probit function with margins to the data
   # data can be specified in two ways:
@@ -119,12 +127,25 @@ fit.mprobit <- function(IDs=NULL, data=NULL, x=NULL, y=NULL, start, lower, upper
         newdat <- data[data$ID == ID, ]
       }
     }
+    newdat$weight <- 1
     aggdat <- aggregate(y ~ x, data=newdat, FUN=FUN)
+    aggwht <- aggregate(weight ~ x, data=newdat, FUN=sum)
+    aggdat <- merge(aggdat, aggwht, by.x='x', by.y='x')
     x <- aggdat$x
     y <- aggdat$y
+    if (is.null(weights)) {
+      w <- aggdat$weight
+    } else {
+      w <- weights
+    }
   } else {
     if (is.null(x) | is.null(y)) {
       stop('x and y must be specified if IDs and data are not provided')
+    }
+    if (is.null(weights)) {
+      w <- rep(1, length(x))
+    } else {
+      w <- weights
     }
   }
   
@@ -139,6 +160,7 @@ fit.mprobit <- function(IDs=NULL, data=NULL, x=NULL, y=NULL, start, lower, upper
                fn=mprobit.nll,
                x=x,
                y=y,
+               w=w,
                method="L-BFGS-B",
                lower=lower,
                upper=upper,
