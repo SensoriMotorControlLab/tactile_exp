@@ -1,0 +1,42 @@
+---
+title: "Vibro-tactile psychophysics"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+
+```{r}
+# plotting stuff:
+source('R/stairCase.R')
+
+# fitting probit functions:
+source('R/mprobit.R')
+```
+
+
+We start with some simple vibro-tactile psychophysics experiments. The goal is to determine the threshold of perception for different "strengths" of vibration. Unfortunately, it seems that frequency and amplitude of vibrations co-vary.
+
+We ran a few labmates on 5-up / 1-down staircases. Two each for stimulation durations of 17, 25, 33, 41 and 50 ms. We should be able to get an idea of the point of subjective equivalence for each duration.
+
+```{r}
+plotFile('data/data/alice5up1down_D/staircase_data.csv', independent = 'strength')
+```
+```{r}
+plotFile('data/data/seta5up1down_D/staircase_data.csv', independent = 'strength')
+```
+```{r}
+plotFile('data/data/marius5up1down_D/staircase_data.csv', independent = 'strength')
+```
+
+All look pretty similar, but with somewhat different PSE's. The data also appears to be quite noisy (and it was a quick and dirty taks). Nevertheless, we can combine all data and get a combined set of psychometric functions, one for each stimulus duration.
+
+```{r}
+combinedPlot(IDs=c('alice','marius','seta'))
+```
+
+Seems like a 50 ms duration gets us a PSE of strength ~40. This leaves some room to increase both the strength of the stimulation as well as the duration.
+
+This is already fairly long compared to the duration of a reach. E.g. if we want to measure suppression during the reach.
+
+Should we also test on the back of the hand?
