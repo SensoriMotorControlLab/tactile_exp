@@ -347,37 +347,78 @@ def setupStaircases(cfg):
     # varying strengths:
     steps = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127]
     
-    minTrials = 20
-    minReversals = 8
+    minTrials = 45
+    minReversals = 15
 
     staircases = []
 
-    for duration in  [17, 25, 33, 41, 50]:
+    # for duration in  [17, 25, 33, 41, 50]:
     # for duration in  [25, 41, 50]:
+    for duration in [33, 50, 67]:
 
         info = {'motor'     : 2,
                 'duration'  : duration,
                 'stepvalue' : 'strength'}
 
-        staircases.append( UDStaircase(
-                steps        = steps,
-                idx          = 0,
-                minTrials    = minTrials,
-                minReversals = minReversals,
-                up           = 5,
-                down         = 1,
-                info         = info
-            ) )
+        staircases.append( DescreasingStepStaircase(
+            steps        = range(0,128,4),
+            idx          = 0,
+            minTrials    = minTrials,
+            minReversals = minReversals,
+            step         = 10,
+            decrease     = 1,
+            info         = info
+        ) )
 
-        staircases.append( UDStaircase(
-                steps        = steps,
-                idx          = len(steps) - 1,
-                minTrials    = minTrials,
-                minReversals = minReversals,
-                up           = 1,
-                down         = 5,
-                info         = info
-            ) )
+        staircases.append( DescreasingStepStaircase(
+            steps        = range(2,128,4),
+            idx          = len(range(2,128,4))-1,
+            minTrials    = minTrials,
+            minReversals = minReversals,
+            step         = 10,
+            decrease     = 1,
+            info         = info
+        ) )
+
+        staircases.append( DescreasingStepStaircase(
+            steps        = range(1,128,4),
+            idx          = 0,
+            minTrials    = minTrials,
+            minReversals = minReversals,
+            step         = 10,
+            decrease     = 1,
+            info         = info
+        ) )
+
+        staircases.append( DescreasingStepStaircase(
+            steps        = range(3,128,4),
+            idx          = len(range(3,128,4))-1,
+            minTrials    = minTrials,
+            minReversals = minReversals,
+            step         = 10,
+            decrease     = 1,
+            info         = info
+        ) )
+
+        # staircases.append( UDStaircase(
+        #         steps        = steps,
+        #         idx          = 0,
+        #         minTrials    = minTrials,
+        #         minReversals = minReversals,
+        #         up           = 5,
+        #         down         = 1,
+        #         info         = info
+        #     ) )
+
+        # staircases.append( UDStaircase(
+        #         steps        = steps,
+        #         idx          = len(steps) - 1,
+        #         minTrials    = minTrials,
+        #         minReversals = minReversals,
+        #         up           = 1,
+        #         down         = 5,
+        #         info         = info
+        #     ) )
 
 
 
