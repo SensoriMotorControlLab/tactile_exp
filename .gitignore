@@ -50,6 +50,8 @@ rsconnect/
 
 
 # custom ignores:
+*.docx
+*.html
 *.png
 *.csv
 *.pdf
