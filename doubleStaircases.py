@@ -64,7 +64,9 @@ def runExperiment(ID=None):
         # cfg = combineData(cfg)
 
         # and maybe generate a summary with one line per trial?
-        cfg = createSummary(cfg)
+        # cfg = createSummary(cfg)
+        # all psychophysics is in one file already, no need to summarize
+        pass
 
     finally:
 
@@ -350,7 +352,8 @@ def setupStaircases(cfg):
 
     staircases = []
 
-    for duration in  [17, 33]:
+    for duration in  [17, 25, 33, 41, 50]:
+    # for duration in  [25, 41, 50]:
 
         info = {'motor'     : 2,
                 'duration'  : duration,
@@ -545,7 +548,7 @@ def runDetectionTrial(cfg):
     cfg['state']['responses']['timejitter'].append(jitter)
     cfg['state']['responses']['response'].append(response)
 
-    pd.DataFrame(cfg['state']['responses']).to_csv('%s/S63_duration_staircases.csv'%(cfg['state']['dataFolder']), index=False)
+    pd.DataFrame(cfg['state']['responses']).to_csv('%s/staircase_data.csv'%(cfg['state']['dataFolder']), index=False)
 
 
 
