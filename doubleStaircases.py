@@ -31,8 +31,10 @@ def runExperiment(ID=None):
     # eventually, we'll write a function that can restart the experiment where it 
     # crashed, if that should ever happen, and for this we use the last 'state' that was saved
 
-    cfg['state'] = {}
-    cfg['bin']   = {}
+    cfg['state'] = {}  # want to store
+    cfg['bin']   = {}  # can not store
+
+    cfg['ext']   = {}  # do not want to store
 
     cfg['state']['ID'] = ID
 
@@ -43,6 +45,8 @@ def runExperiment(ID=None):
         cfg = prepare(cfg)
 
         # cfg = runTasks(cfg)
+
+        cfg = runFamiliarization(cfg)
 
         cfg = runStaircases(cfg)
 
@@ -162,7 +166,7 @@ def setupPsychopyWindow(cfg):
                                  width=52.7)
     myMonitor.setSizePix([1920,1080])
 
-    cfg["bin"]['win'] = visual.Window( size=[1920,1080], 
+    cfg['bin']['win'] = visual.Window( size=[1920,1080], 
                                 fullscr=True, 
                                 units='cm', 
                                 waitBlanking=False, 
@@ -230,7 +234,7 @@ def setupTabletTracker(cfg):
     # make them system timestamps in UNIX time (seconds since jan 1st 1980)
     # so that we also know exactly when the participant did the task
 
-    cfg['bin']["tracker"] = myMouse(cfg)
+    cfg['bin']['tracker'] = myMouse(cfg)
 
     return(cfg)
 
@@ -451,6 +455,118 @@ def setupStaircases(cfg):
 
 #     return(cfg)
 
+def runFamiliarization(cfg):
+
+
+        # cfg['bin']['instruction'] = visual.TextStim(win=cfg['bin']['win'], text='hello world', pos=[0,0], colorSpace='rgb', color='#999999')
+    cfg['bin']['instruction'].text = 'press SPACE to start familiarization'
+    cfg['bin']['instruction'].draw()
+    cfg['bin']['win'].flip()
+
+    # wait for press of the space bar:
+    k = ['wait']
+    while k[0] not in ['space', 'q']:
+        k = event.waitKeys()
+        # cfg['bin']['instruction'].draw()
+        # cfg['bin']['win'].flip()
+
+    if k[0] in ['q']:
+        cfg['ext']['quit'] = True
+
+
+    
+
+    strengths = [0,0,0,0,127,127,127,127]
+    random.shuffle(strengths)
+
+    motor = 2
+    duration = 200
+
+    for strength in strengths:
+
+        prepcommand = 'M%d.S%d.D%d.'%(motor, strength, duration)
+
+        cfg['bin']['TVFU'].write(bytes(prepcommand, 'utf-8'))
+
+        # blank screen
+        blank = 0.5
+        # stimulus cue
+        # wait interval
+        # stimulus jitter
+        jitter = random.uniform(0, 1)
+        # stimulus presentation
+        stimulusOnset = blank + jitter
+        # response cue
+        cueTime = blank + 1.5
+        # get response
+        # store data and end trial
+        startTime = time.time()
+
+        presentStimulus = True
+        inStimulusInterval = True
+        cfg['bin']['cursor'].fillColor = '#ff0000'
+
+
+        while inStimulusInterval:
+            now = time.time()
+            if now > (startTime + stimulusOnset):
+                # do tactile stimulation
+                if (presentStimulus):
+                    presentStimulus = False
+                    cfg['bin']['TVFU'].write(bytes('G2.', 'utf-8'))
+
+                pass
+            if now > (startTime + cueTime):
+                cfg['bin']['cursor'].fillColor = '#0000ff'
+                inStimulusInterval = False
+            if now > (startTime + blank):
+                cfg['bin']['cursor'].draw()
+            cfg['bin']['win'].flip()
+    
+        # wait for response
+        k = ['wait']
+
+        # left  = no stimulus detected  -> go up the staircase
+        # right = detected stimulus     -> go down the staircase
+
+        correct = True
+
+        while k[0] not in ['left', 'right', 'q']:
+            k = event.waitKeys()
+        if k[0] in ['q']:
+            # quit task?
+            response = -1
+            print('Q pressed')
+            cfg['ext']['quit'] = True
+        if k[0] in ['left']:
+            response = 0
+            if strength > 0:
+                correct = False
+        if k[0] in ['right']:
+            response = 1
+            if strength == 0:
+                correct = False
+
+
+        # if correct:
+        #     cfg['bin']['instruction'].text = 'correct'
+        # else:
+        #     cfg['bin']['instruction'].text = 'incorrect'
+
+        cfg['bin']['instruction'].text = 'correct' if correct else 'incorrect'
+
+        cfg['bin']['instruction'].draw()
+        cfg['bin']['win'].flip()
+
+        startTime = time.time()
+        now = time.time()
+        while now < (startTime + 1.0):
+            cfg['bin']['instruction'].draw()
+            cfg['bin']['win'].flip()
+            now = time.time()
+
+    return(cfg)
+
 def getrunningStaircases(staircases):
 
     runningStaircases = []
@@ -465,19 +581,61 @@ def runStaircases(cfg):
     runningStaircases = getrunningStaircases(cfg['bin']['staircases'])
 
     cfg['state']['currenttrial'] = 1
+    cfg['ext']['quit'] = False
 
     while len(runningStaircases):
         
+
+        if cfg['ext']['quit']:
+            break
         # no non-stimulus trials?
         # runningStaircases += [-1] * int(np.ceil(len(runningStaircases)/2))
 
+
         random.shuffle(runningStaircases)
         for staircase_idx in runningStaircases:
+
+            # build in a break here? once every 80 trials?
+            if ((cfg['state']['currenttrial'] - 1) % 4) == 0:
+                cfg = doBreak(cfg)
+                # if q pressed, break
+                if cfg['ext']['quit']:
+                    break
+
+            # take care of the actual trial
             cfg['state']['currentStaircase'] = staircase_idx
             cfg = runDetectionTrial(cfg)
             cfg['state']['currenttrial'] += 1
 
+            # if q pressed, break
+            if cfg['ext']['quit']:
+                break
+
+        # if q pressed, break
+        if cfg['ext']['quit']:
+            break
+
         runningStaircases = getrunningStaircases(cfg['bin']['staircases'])
+
+
+    return(cfg)
+
+def doBreak(cfg):
+
+    # cfg['bin']['instruction'] = visual.TextStim(win=cfg['bin']['win'], text='hello world', pos=[0,0], colorSpace='rgb', color='#999999')
+    cfg['bin']['instruction'].text = 'press SPACE to start the next block'
+    cfg['bin']['instruction'].draw()
+    cfg['bin']['win'].flip()
+
+    # wait for press of the space bar:
+    k = ['wait']
+    while k[0] not in ['space', 'q']:
+        k = event.waitKeys()
+        # cfg['bin']['instruction'].draw()
+        # cfg['bin']['win'].flip()
+
+    if k[0] in ['q']:
+        cfg['ext']['quit'] = True
 
     return(cfg)
 
@@ -527,7 +685,7 @@ def runDetectionTrial(cfg):
     # stimulus presentation
     stimulusOnset = blank + jitter
     # response cue
-    cueTime = blank + 2
+    cueTime = blank + 1.5
     # get response
     # store data and end trial
     startTime = time.time()
@@ -564,7 +722,8 @@ def runDetectionTrial(cfg):
     if k[0] in ['q']:
         # quit task?
         response = -1
-        pass # for now
+        print('Q pressed')
+        cfg['ext']['quit'] = True
     if k[0] in ['left']:
         response = 0
         if staircase_idx >= 0:
