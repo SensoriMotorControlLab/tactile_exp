@@ -334,7 +334,7 @@ def setupTasks(cfg):
 def runFamiliarization(cfg):
 
     # cfg['bin']['instruction'] = visual.TextStim(win=cfg['bin']['win'], text='hello world', pos=[0,0], colorSpace='rgb', color='#999999')
-    cfg['bin']['instruction'].text = 'press SPACE to start familiarization'
+    cfg['bin']['instruction'].text = 'On each trial, you will see a red dot. If you detect a vibration, press the RIGHT ARROW key when the dot turns blue. If you do not detect a vibration, press the LEFT ARROW key. When you are ready, press SPACE to start the familiarization task.'
     cfg['bin']['instruction'].draw()
     cfg['bin']['win'].flip()
 
@@ -441,6 +441,21 @@ def runFamiliarization(cfg):
 
 def runTasks(cfg):
     print("runTasks")
+
+    cfg['bin']['instruction'].text = 'When the target appears, move the cursor inside the target. Once inside the target, if you detected a vibration, press the RIGHT ARROW key. If you did not detect a vibration, press the LEFT ARROW key. After you have responded, move the cursor inside the start position to begin the next trial. <br> Press SPACE to begin the task.'
+    cfg['bin']['instruction'].draw()
+    cfg['bin']['win'].flip()
+
+        # wait for press of the space bar:
+    k = ['wait']
+    while k[0] not in ['space', 'q']:
+        k = event.waitKeys()
+        # cfg['bin']['instruction'].draw()
+        # cfg['bin']['win'].flip()
+
+    if k[0] in ['q']:
+        cfg['ext']['quit'] = True
+
     print(len(cfg["state"]["trialOrder"]))
     trialOrder = cfg['state']['trialOrder']
     nTrials = len(trialOrder)
